@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Artha</string>
+    <string name="search_currency">Cari Mata Uang</string>
+    <string name="select_currency">Pilih Mata Uang</string>
+</resources>
