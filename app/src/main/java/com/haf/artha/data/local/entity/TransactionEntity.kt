@@ -32,9 +32,9 @@ data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val transactionId: Int? = null,
-    @ColumnInfo(name = "account_id")
+    @ColumnInfo(name = "account_id", index = true)
     val accountId: Int,
-    @ColumnInfo(name = "category_id")
+    @ColumnInfo(name = "category_id", index = true)
     val categoryId: Int,
     @ColumnInfo(name = "name")
     val transactionName: String,
