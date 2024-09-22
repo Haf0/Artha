@@ -12,4 +12,14 @@ class LocalRepository(
     fun getAccounts() : Flow<List<AccountEntity>> = appDao.getAccounts()
     fun getCategories() : Flow<List<CategoryEntity>> = appDao.getCategories()
     fun getTransactions() : Flow<List<TransactionEntity>> = appDao.getTransactions()
+    suspend fun insertCategory(listCategory: List<CategoryEntity>){
+        listCategory.forEach {
+            appDao.insertCategory(it)
+        }
+    }
+    suspend fun insertAccount(listAccount: List<AccountEntity>){
+        listAccount.forEach {
+            appDao.insertAccount(it)
+        }
+    }
 }

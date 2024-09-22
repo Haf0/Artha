@@ -1,6 +1,7 @@
 package com.haf.artha.data.local.db
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import com.haf.artha.data.local.entity.AccountEntity
 import com.haf.artha.data.local.entity.CategoryEntity
@@ -18,4 +19,13 @@ interface AppDao {
 
     @Query("SELECT * FROM `transaction`")
     fun getTransactions(): Flow<List<TransactionEntity>>
+
+    @Insert
+    suspend fun insertCategory(category: CategoryEntity)
+
+    @Insert
+    suspend fun insertAccount(account: AccountEntity)
+
+    @Insert
+    suspend fun insertTransaction(transaction: TransactionEntity)
 }
