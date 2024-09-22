@@ -1,5 +1,6 @@
 package com.haf.artha.presentation.component
 
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
@@ -9,6 +10,8 @@ fun AccountItem(
     onclick : () -> Unit
 ) {
     //tommorow add something like category but for account and list all local e wallet
+    Card(onClick = { /*TODO*/ }) {
+        
+    }
 
-    val listEwalletIndonesia = listOf("OVO", "DANA", "LinkAja", "GoPay", "ShopeePay", "PayPal", "Sakuku", "Jenius", "BCA", "BNI", "Mandiri", "BRI", "CIMB Niaga", "Permata", "Maybank", "Panin", "Danamon", "BTPN", "Bukalapak", "Tokopedia", "Blibli", "Alfamart", "Indomaret", "Circle K", "7 Eleven", "Lawson", "FamilyMart", "Hypermart", "Carrefour", "Giant",
 }
