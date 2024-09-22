@@ -24,13 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.haf.artha.R
+import com.haf.artha.presentation.Navigation.Screen
 
 @Composable
 fun SetUsername(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     val context = LocalContext.current
     Box(
@@ -56,7 +58,7 @@ fun SetUsername(
                 style = MaterialTheme.typography.bodyLarge,
                 fontFamily = FontFamily.SansSerif
             )
-            InputUsername(modifier = modifier, context = context)
+            InputUsername(modifier = modifier, context = context, navController = navController)
         }
 
 
@@ -65,7 +67,7 @@ fun SetUsername(
 
 
 @Composable
-fun InputUsername(modifier: Modifier = Modifier, context: Context) {
+fun InputUsername(modifier: Modifier = Modifier, context: Context, navController: NavController) {
 
     var username by remember { mutableStateOf("") }
     Column(
@@ -90,7 +92,8 @@ fun InputUsername(modifier: Modifier = Modifier, context: Context) {
                 if (username.isNotEmpty()) {
                     /*TODO*/
                     // navigate to next screen
-                    Toast.makeText(context, "Lanjut", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, username, Toast.LENGTH_SHORT).show()
+                    navController.navigate(Screen.SetAccount.route)
                 }else{
                     // show error message
                     Toast.makeText(context, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
@@ -105,10 +108,4 @@ fun InputUsername(modifier: Modifier = Modifier, context: Context) {
     }
 
 
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun Preview(modifier: Modifier = Modifier) {
-    SetUsername()
 }
