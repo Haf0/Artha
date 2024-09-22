@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.haf.artha.presentation.onboarding.setUsername.SetUsername
+import com.haf.artha.presentation.Navigation.NavigationBuilder
 import com.haf.artha.ui.theme.ArthaTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -16,8 +16,7 @@ class MainActivity : ComponentActivity() {
         setContent{
             installSplashScreen()
             ArthaTheme {
-                // A surface container using the 'background' color from the theme'
-                SetUsername()
+                NavigationBuilder()
             }
         }
     }
