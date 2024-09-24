@@ -20,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.haf.artha.presentation.Navigation.Screen
+import com.haf.artha.presentation.navigation.Screen
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -46,12 +46,12 @@ fun SetAccount (
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Pilih Kategori",
+                text = "Pilih Akun",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = modifier.padding(8.dp)
             )
             Text(
-                text = "Pilih kategori yang ingin kamu tambahkan",
+                text = "Pilih akun yang ingin kamu tambahkan",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = modifier.padding(8.dp)
             )

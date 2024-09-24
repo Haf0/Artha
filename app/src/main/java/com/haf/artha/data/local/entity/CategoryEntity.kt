@@ -14,4 +14,6 @@ data class CategoryEntity (
     val id: Int? = null,
     @ColumnInfo(name = "name")
     val name: String,
+    @ColumnInfo(name="color")
+    val color: Int
 ) : Parcelable

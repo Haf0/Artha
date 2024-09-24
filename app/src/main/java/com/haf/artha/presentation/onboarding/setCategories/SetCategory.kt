@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -24,9 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
+import kotlin.random.Random
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -56,6 +60,14 @@ fun SetCategory(
 
     var dummies by remember { mutableStateOf(dummyList) }
     val selectedList by remember { mutableStateOf(mutableListOf<String>()) }
+
+
+    val randomColorList by remember {
+        mutableStateOf(mutableListOf<Color>())
+    }
+    for(i in 0..dummies.size){
+        randomColorList.add(Color(0xFF000000.toInt() + Random.nextInt(0x1000000)))
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -84,6 +96,7 @@ fun SetCategory(
                 repeat(dummies.size) { index ->
                     OnboardingItem(
                         list =dummies,
+                        listColor = randomColorList,
                         index = index,
                         onClick = {
                             if (selectedList.contains(dummies[index])) {
@@ -95,7 +108,8 @@ fun SetCategory(
                                 Log.d("selectedList", "SetCategory: add ${dummies[index]}")
                                 Log.d("selectedList", "SetCategory: " + selectedList.toString())
                             }
-                        }
+                        },
+                        isCategory = true
                     )
                 }
             }
@@ -120,7 +134,9 @@ fun SetCategory(
                         category = newCategory
                     },
                     label = { Text("Masukkan Kategori") },
-                    modifier = modifier.padding(end = 8.dp)
+                    modifier = modifier.padding(end = 8.dp),
+                    singleLine = true ,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
 
                 )
 
