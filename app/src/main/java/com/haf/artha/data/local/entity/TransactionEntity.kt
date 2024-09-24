@@ -38,8 +38,14 @@ data class TransactionEntity(
     val categoryId: Int,
     @ColumnInfo(name = "name")
     val transactionName: String,
-    @ColumnInfo(name = "date")
-    val transactionDate: String,
+    @ColumnInfo(name="day_of_week")
+    val transactionDayOfWeek: String,
+    @ColumnInfo(name="day")
+    val transactionDay: Int,
+    @ColumnInfo(name="month")
+    val transactionMonth: Int,
+    @ColumnInfo(name="year")
+    val transactionYear: Int,
     @ColumnInfo(name = "type")
     val transactionType: String,
     @ColumnInfo(name = "note")
