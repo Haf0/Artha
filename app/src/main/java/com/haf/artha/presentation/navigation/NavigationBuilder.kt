@@ -1,4 +1,4 @@
-package com.haf.artha.presentation.Navigation
+package com.haf.artha.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost

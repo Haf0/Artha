@@ -1,9 +1,8 @@
-package com.haf.artha.presentation.Navigation
+package com.haf.artha.presentation.navigation
 
 sealed class Screen(
     val route: String
 ) {
-    object Onboarding : Screen("onboarding")
     object SetCategory : Screen("setCategory")
     object SetAccount : Screen("setAccount")
     object SetUsername : Screen("setUsername")
