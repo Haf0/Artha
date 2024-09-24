@@ -44,12 +44,11 @@ fun HomeScreenContent(
         BalanceItem(
             balance = totalBalance
         )
-
         IncomeOutcomeItem(
             income = income,
             outcome = outcome
         )
-        HorizontalDivider(color = PurpleGrey40, thickness = 1.dp)
+        HorizontalDivider(color = PurpleGrey40, thickness = 1.dp, modifier = Modifier.padding(top = 16.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -63,7 +62,7 @@ fun HomeScreenContent(
                 Text(text = "Lihat Semua")
             }
         }
-        HorizontalDivider(color = PurpleGrey40, thickness = 1.dp)
+        HorizontalDivider(color = PurpleGrey40, thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
 
         LazyColumn {
             items(listHistoryTransaction){
