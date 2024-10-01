@@ -27,14 +27,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.haf.artha.R
 import com.haf.artha.presentation.navigation.Screen
 
 @Composable
 fun SetUsername(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavHostController
 ) {
     val context = LocalContext.current
     Box(
@@ -69,7 +69,7 @@ fun SetUsername(
 
 
 @Composable
-fun InputUsername(modifier: Modifier = Modifier, context: Context, navController: NavController) {
+fun InputUsername(modifier: Modifier = Modifier, context: Context, navController: NavHostController) {
 
     var username by remember { mutableStateOf("") }
     Column(

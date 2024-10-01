@@ -19,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.haf.artha.presentation.navigation.Screen
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
 
@@ -27,9 +27,10 @@ import com.haf.artha.presentation.onboarding.component.OnboardingItem
 @Composable
 fun SetAccount (
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavHostController
 ) {
     //tommorow add something like category but for account and list all local e wallet
+
 
     val dummyAccountList = mutableListOf("Cash", "Bank", "Credit Card", "Debit Card", "E-Wallet", "Others")
     val dummies by remember { mutableStateOf(dummyAccountList) }

@@ -28,7 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.haf.artha.presentation.navigation.Screen
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
 import kotlin.random.Random
 
@@ -36,8 +37,9 @@ import kotlin.random.Random
 @Composable
 fun SetCategory(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavHostController
 ) {
+
 
 
     var dummyList =
@@ -159,9 +161,7 @@ fun SetCategory(
             Button(
                 onClick = {
                     if (selectedList.isNotEmpty()) {
-                        /*TODO*/
-                        // navigate to next screen and add to category db
-
+                        navController.navigate(Screen.Home.route)
                         Log.d("selectedList", "SetCategory: " + selectedList.toString())
                     } else {
                         // show error message

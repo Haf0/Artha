@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.presentation.home.component.BalanceItem
 import com.haf.artha.presentation.home.component.IncomeOutcomeItem
@@ -22,9 +23,22 @@ import com.haf.artha.ui.theme.PurpleGrey40
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
-
+    HomeScreenContent(
+        modifier = modifier,
+        onNavigateToListTransaction = {
+            //TODO navigate to list transaction
+        },
+        onNavigateToDetailTransaction = {
+            //TODO navigate to detail transaction
+        },
+        totalBalance = "Rp 10000000",
+        income = "Rp 10000000",
+        outcome = "Rp 10000000",
+        listHistoryTransaction = listOf()
+    )
 }
 
 
