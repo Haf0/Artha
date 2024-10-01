@@ -3,8 +3,6 @@ package com.haf.artha
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.haf.artha.presentation.navigation.NavigationBuilder
 import com.haf.artha.ui.theme.ArthaTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -14,9 +12,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent{
-            installSplashScreen()
             ArthaTheme {
-                NavigationBuilder()
+                ArthaApp()
             }
         }
     }
