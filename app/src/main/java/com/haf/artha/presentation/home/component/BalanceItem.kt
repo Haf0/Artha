@@ -34,19 +34,20 @@ fun BalanceItem(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(32.dp)
+                .padding(top = 64.dp, start = 32.dp, end = 32.dp, bottom = 64.dp)
         ){
             Text(
                 text = "Total Saldo",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = modifier
-                    .padding(bottom = 8.dp)
+                    .padding(bottom = 16.dp)
             )
             Text(text = balance,
                 style = style,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Medium)
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
