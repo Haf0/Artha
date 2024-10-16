@@ -7,18 +7,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.haf.artha.R
+import com.haf.artha.navigation.Screen
+import kotlinx.coroutines.delay
 
 
 @Composable
 fun SplashScreen(
     navController: NavHostController
 ) {
+    /*TODO*/
+    var isOnboardingCompleted = true
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -26,7 +31,24 @@ fun SplashScreen(
         contentAlignment = Alignment.Center
     ) {
         Image(painter = painterResource(id = R.drawable.ic_splash), contentDescription = "Splash Screen Image", modifier = Modifier.size(300.dp))
+        LaunchedEffect(key1 = true) {
+            delay(2000)
+            if(isOnboardingCompleted){
+                navController.navigate(Screen.Home.route){
+                    popUpTo(Screen.SplashScreen.route){
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }else{
+                navController.navigate(Screen.SetUsername.route){
+                    popUpTo(Screen.SplashScreen.route){
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
 
-        //TODO check preference if user already complete onboarding
+        }
     }
 }
