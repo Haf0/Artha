@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.haf.artha.R
-import com.haf.artha.presentation.navigation.Screen
+import com.haf.artha.navigation.Screen
 
 @Composable
 fun SetUsername(

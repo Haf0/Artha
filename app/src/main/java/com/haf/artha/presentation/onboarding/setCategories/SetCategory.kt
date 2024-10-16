@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.haf.artha.presentation.navigation.Screen
+import com.haf.artha.navigation.Screen
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
 import kotlin.random.Random
 
@@ -128,21 +128,20 @@ fun SetCategory(
 
             Row(
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
+                    modifier = modifier.weight(1f).padding(end = 8.dp),
                     value = category,
                     onValueChange = {newCategory ->
                         category = newCategory
                     },
-                    label = { Text("Masukkan Kategori") },
-                    modifier = modifier.padding(end = 8.dp),
+                    label = { Text("Tambah Kategori") },
                     singleLine = true ,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                 )
-
                 Button(
+                    modifier = modifier.weight(0.15f),
                     onClick = {
                         if (category.isNotEmpty()) {
                             dummies.add(category)

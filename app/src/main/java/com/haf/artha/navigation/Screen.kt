@@ -1,4 +1,4 @@
-package com.haf.artha.presentation.navigation
+package com.haf.artha.navigation
 
 sealed class Screen(
     val route: String
