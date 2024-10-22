@@ -17,6 +17,6 @@ data class AccountEntity(
     val type: String,
     @ColumnInfo(name = "name")
     val name: String,
-    @ColumnInfo(name = "ccount_balance")
+    @ColumnInfo(name = "account_balance")
     val balance: Double
 ) : Parcelable
