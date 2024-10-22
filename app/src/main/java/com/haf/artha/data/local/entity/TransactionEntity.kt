@@ -6,11 +6,12 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
+import com.haf.artha.data.local.model.TransactionType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Entity(
-    tableName = "transaction",
+    tableName = "transactions",
     foreignKeys = [
         ForeignKey(
             entity = AccountEntity::class,
@@ -38,16 +39,10 @@ data class TransactionEntity(
     val categoryId: Int,
     @ColumnInfo(name = "name")
     val transactionName: String,
-    @ColumnInfo(name="day_of_week")
-    val transactionDayOfWeek: String,
-    @ColumnInfo(name="day")
-    val transactionDay: Int,
-    @ColumnInfo(name="month")
-    val transactionMonth: Int,
-    @ColumnInfo(name="year")
-    val transactionYear: Int,
+    @ColumnInfo(name = "date")
+    val transactionDate: Long,
     @ColumnInfo(name = "type")
-    val transactionType: String,
+    val transactionType: TransactionType,
     @ColumnInfo(name = "note")
     val transactionNote: String,
     @ColumnInfo(name = "amount")
