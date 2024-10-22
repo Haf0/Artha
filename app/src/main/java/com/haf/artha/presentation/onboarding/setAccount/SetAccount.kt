@@ -19,15 +19,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.haf.artha.navigation.Screen
+import com.haf.artha.preference.PreferenceViewModel
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SetAccount (
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    preferenceViewModel: PreferenceViewModel = hiltViewModel()
 ) {
     //tommorow add something like category but for account and list all local e wallet
 
@@ -87,8 +90,8 @@ fun SetAccount (
                 onClick = {
                     if (selectedList.isNotEmpty()) {
                         /*TODO*/
-                        // navigate to next screen and add to category db
-
+                        // add to account db
+                        preferenceViewModel.setCurrentStep(2)
                         navController.navigate(Screen.SetCategory.route)
                         Log.d("selectedList", "SetCategory: " + selectedList.toString())
                     } else {

@@ -27,9 +27,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.haf.artha.R
 import com.haf.artha.navigation.Screen
+import com.haf.artha.preference.PreferenceViewModel
 
 @Composable
 fun SetUsername(
@@ -69,7 +71,11 @@ fun SetUsername(
 
 
 @Composable
-fun InputUsername(modifier: Modifier = Modifier, context: Context, navController: NavHostController) {
+fun InputUsername(
+    modifier: Modifier = Modifier, context: Context,
+    navController: NavHostController,
+    preferenceViewModel: PreferenceViewModel = hiltViewModel()
+) {
 
     var username by remember { mutableStateOf("") }
     Column(
@@ -94,8 +100,8 @@ fun InputUsername(modifier: Modifier = Modifier, context: Context, navController
         Button(
             onClick = {
                 if (username.isNotEmpty()) {
-                    /*TODO*/
-                    // navigate to next screen
+                    preferenceViewModel.setUsername(username)
+                    preferenceViewModel.setCurrentStep(1)
                     Toast.makeText(context, username, Toast.LENGTH_SHORT).show()
                     navController.navigate(Screen.SetAccount.route)
                 }else{

@@ -28,8 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.haf.artha.navigation.Screen
+import com.haf.artha.preference.PreferenceViewModel
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
 import kotlin.random.Random
 
@@ -37,7 +39,8 @@ import kotlin.random.Random
 @Composable
 fun SetCategory(
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    preferenceViewModel: PreferenceViewModel = hiltViewModel()
 ) {
 
 
@@ -160,6 +163,9 @@ fun SetCategory(
             Button(
                 onClick = {
                     if (selectedList.isNotEmpty()) {
+                        /*TODO*/
+                        // add to category db
+                        preferenceViewModel.completeOnboarding()
                         navController.navigate(Screen.Home.route)
                         Log.d("selectedList", "SetCategory: " + selectedList.toString())
                     } else {
