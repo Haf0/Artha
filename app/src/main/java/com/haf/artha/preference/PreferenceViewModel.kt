@@ -1,22 +1,71 @@
 package com.haf.artha.preference
 
-import android.preference.PreferenceManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//@HiltViewModel
-//class PreferenceViewModel @Inject constructor(private val preference: PreferenceManager): ViewModel(){
-//    fun saveOnboardingState(step: Int){
-//        viewModelScope.launch {
-//            preference.setOnboardingStep(step)
-//        }
-//    }
-//
-//    fun getOnboardingStep() = preference.getOnboardingStep()
-//    fun getOnboardingStatus() = preference.getOnboardingStatus()
-//
-//
-//}
+@HiltViewModel
+class PreferenceViewModel @Inject constructor(private val preferenceManager: PreferenceManager): ViewModel(){
+    private val _onboardingCompleted = MutableStateFlow(false)
+    val onboardingCompleted: StateFlow<Boolean> = _onboardingCompleted
+
+    private val _currentStep = MutableStateFlow(0)
+    val currentStep: StateFlow<Int> = _currentStep
+
+    init {
+        viewModelScope.launch {
+            preferenceManager.getOnboardingStatus().collect { isCompleted ->
+                _onboardingCompleted.value = isCompleted
+            }
+        }
+        viewModelScope.launch {
+            preferenceManager.getOnboardingStep().collect { step ->
+                _currentStep.value = step
+            }
+        }
+    }
+
+    fun checkOnboardingStatus(): Flow<Pair<Boolean, Int>> {
+        return combine(
+            preferenceManager.getOnboardingStatus(),
+            preferenceManager.getOnboardingStep()
+        ) { isCompleted, step ->
+            Pair(isCompleted, step)
+        }
+    }
+
+    private fun setOnboardingCompleted() {
+        viewModelScope.launch {
+            preferenceManager.setHasCompletedOnboarding(true)
+        }
+    }
+
+    fun setCurrentStep(step: Int) {
+        viewModelScope.launch {
+            preferenceManager.setOnboardingStep(step)
+        }
+    }
+
+    fun completeOnboarding() {
+        setOnboardingCompleted()
+        setCurrentStep(0) // Reset step to 0 when onboarding is completed
+    }
+
+
+    fun getUsername(): Flow<String> {
+        return preferenceManager.getUsername()
+    }
+
+    fun setUsername(username: String) {
+        viewModelScope.launch {
+            preferenceManager.setUsername(username)
+        }
+    }
+
+}
