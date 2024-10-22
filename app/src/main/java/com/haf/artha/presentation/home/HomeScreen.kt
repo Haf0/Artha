@@ -1,5 +1,6 @@
 package com.haf.artha.presentation.home
 
+import DateUtils.toFormattedDate
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.haf.artha.data.local.entity.TransactionEntity
+import com.haf.artha.data.local.model.TransactionType
 import com.haf.artha.presentation.home.component.BalanceItem
 import com.haf.artha.presentation.home.component.IncomeOutcomeItem
 import com.haf.artha.presentation.home.component.TransactionHistoryItem
@@ -81,10 +83,11 @@ fun HomeScreenContent(
         LazyColumn {
             items(listHistoryTransaction){
                 TransactionHistoryItem(
-                    /*TODO change it.categoruId to category color*/
+                    /*TODO*/
+                    // change it.categoruId to category color
                     intColor = it.categoryId,
                     title = it.transactionName,
-                    date = "${it.transactionDayOfWeek}, ${it.transactionDay} ${it.transactionMonth} ${it.transactionYear}",
+                    date = it.transactionDate.toFormattedDate(),
                     amount = it.transactionAmount.toString()
                 )
             }
@@ -104,183 +107,13 @@ fun HomeScreenPreview() {
             accountId = 1,
             categoryId = 1,
             transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
+            transactionDate = 1703980800000,
+            transactionType = TransactionType.INCOME,
             transactionNote = "Transaction 1",
             transactionAmount = 1000000.0,
             
         ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
 
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            ),
-        TransactionEntity(
-            transactionId = 1,
-            accountId = 1,
-            categoryId = 1,
-            transactionName = "Transaction 1",
-            transactionDayOfWeek = "Rabu",
-            transactionDay = 1,
-            transactionMonth = 12,
-            transactionYear = 2021,
-            transactionType = "INCOME",
-            transactionNote = "Transaction 1",
-            transactionAmount = 1000000.0,
-
-            )
     )
     HomeScreenContent(
         onNavigateToListTransaction = {},
