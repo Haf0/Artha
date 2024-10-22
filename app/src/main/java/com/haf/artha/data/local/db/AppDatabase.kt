@@ -7,6 +7,7 @@ import androidx.room.TypeConverters
 import com.haf.artha.data.local.entity.AccountEntity
 import com.haf.artha.data.local.entity.CategoryEntity
 import com.haf.artha.data.local.entity.TransactionEntity
+import com.haf.artha.utils.AccountTypeConverter
 import com.haf.artha.utils.TransactionTypeConverter
 
 @Database(
@@ -18,7 +19,7 @@ import com.haf.artha.utils.TransactionTypeConverter
     version = 1,
     exportSchema = false
 )
-@TypeConverters(TransactionTypeConverter::class)
+@TypeConverters(TransactionTypeConverter::class, AccountTypeConverter::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun accountDao(): AccountDao
