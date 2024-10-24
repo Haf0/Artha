@@ -1,6 +1,6 @@
 package com.haf.artha.presentation.onboarding.setAccount
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,9 +18,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.haf.artha.data.local.entity.AccountEntity
 import com.haf.artha.navigation.Screen
 import com.haf.artha.preference.PreferenceViewModel
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
@@ -30,13 +32,12 @@ import com.haf.artha.presentation.onboarding.component.OnboardingItem
 fun SetAccount (
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    preferenceViewModel: PreferenceViewModel = hiltViewModel()
+    preferenceViewModel: PreferenceViewModel = hiltViewModel(),
+    setAccountViewModel: SetAccountViewModel = hiltViewModel()
 ) {
-    //tommorow add something like category but for account and list all local e wallet
-
-
-    val dummyAccountList = mutableListOf("Cash", "Bank", "Credit Card", "Debit Card", "E-Wallet", "Others")
+    val dummyAccountList = mutableListOf("Tunai", "Bank", "Kartu Kredit", "Kartu Debit", "E-Wallet", "Lainnya")
     val dummies by remember { mutableStateOf(dummyAccountList) }
+    val context = LocalContext.current
     val selectedList = mutableListOf<String>()
     Box(
         modifier = modifier
@@ -89,13 +90,14 @@ fun SetAccount (
             Button(
                 onClick = {
                     if (selectedList.isNotEmpty()) {
-                        /*TODO*/
-                        // add to account db
                         preferenceViewModel.setCurrentStep(2)
+                        val selectedAccountList = selectedList.map{
+                            AccountEntity(type = it, name = it, balance = 0.0)
+                        }
+                        setAccountViewModel.insertAccount(selectedAccountList)
                         navController.navigate(Screen.SetCategory.route)
-                        Log.d("selectedList", "SetCategory: " + selectedList.toString())
                     } else {
-                        // show error message
+                        Toast.makeText(context, "Silahkan Pilih Minimal 1 Akun", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = modifier
