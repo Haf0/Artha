@@ -1,6 +1,7 @@
 package com.haf.artha.presentation.onboarding.setCategories
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,10 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.haf.artha.data.local.entity.CategoryEntity
 import com.haf.artha.navigation.Screen
 import com.haf.artha.preference.PreferenceViewModel
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
@@ -40,11 +44,10 @@ import kotlin.random.Random
 fun SetCategory(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    preferenceViewModel: PreferenceViewModel = hiltViewModel()
+    preferenceViewModel: PreferenceViewModel = hiltViewModel(),
+    setCategoryViewModel: SetCategoryViewModel = hiltViewModel()
 ) {
-
-
-
+    val context = LocalContext.current
     var dummyList =
         mutableListOf(
             "Makan",
@@ -61,7 +64,8 @@ fun SetCategory(
             "Donasi",
             "Travel",
             "Rumah Tangga",
-            "Lainnya")
+            "Lainnya"
+        )
 
     var dummies by remember { mutableStateOf(dummyList) }
     val selectedList by remember { mutableStateOf(mutableListOf<String>()) }
@@ -134,7 +138,9 @@ fun SetCategory(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    modifier = modifier.weight(1f).padding(end = 8.dp),
+                    modifier = modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
                     value = category,
                     onValueChange = {newCategory ->
                         category = newCategory
@@ -163,14 +169,18 @@ fun SetCategory(
             Button(
                 onClick = {
                     if (selectedList.isNotEmpty()) {
-                        /*TODO*/
-                        // add to category db
                         preferenceViewModel.completeOnboarding()
+                        val selectedCategoryEntity = selectedList.map {
+                            CategoryEntity(
+                                name = it,
+                                color = randomColorList[dummies.indexOf(it)].toArgb()
+                            )
+                        }
+                        setCategoryViewModel.insertCategory(selectedCategoryEntity)
                         navController.navigate(Screen.Home.route)
-                        Log.d("selectedList", "SetCategory: " + selectedList.toString())
                     } else {
                         // show error message
-                        Log.d("selectedList", "SetCategory: Error ${selectedList.toString()} ")
+                        Toast.makeText(context, "Silahkan pilih minimal satu kategori", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = modifier
