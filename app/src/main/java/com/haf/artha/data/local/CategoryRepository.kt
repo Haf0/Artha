@@ -3,12 +3,13 @@ package com.haf.artha.data.local
 import com.haf.artha.data.local.db.CategoryDao
 import com.haf.artha.data.local.entity.CategoryEntity
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class CategoryRepository(
+class CategoryRepository @Inject constructor(
     private val categoryDao: CategoryDao
 ) {
-    suspend fun insertCategory(category: CategoryEntity) {
-        categoryDao.insert(category)
+    suspend fun insertCategory(categories: List<CategoryEntity>) {
+        categoryDao.insert(categories)
     }
 
     suspend fun updateCategory(category: CategoryEntity) {
