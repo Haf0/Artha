@@ -32,7 +32,7 @@ import kotlinx.parcelize.Parcelize
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val transactionId: Int? = null,
+    val transactionId: Int = 0,
     @ColumnInfo(name = "account_id", index = true)
     val accountId: Int,
     @ColumnInfo(name = "category_id", index = true)

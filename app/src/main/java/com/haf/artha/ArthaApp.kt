@@ -64,8 +64,6 @@ fun ArthaApp(
             }
         }
     ) { innerPadding ->
-
-        //change StartDestination to SplashScreen
         NavHost(
             navController = navController,
             startDestination = Screen.SplashScreen.route,

@@ -12,7 +12,7 @@ import kotlinx.parcelize.Parcelize
 data class AccountEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Int,
+    val id: Int = 0,
     @ColumnInfo(name = "type")
     val type: String,
     @ColumnInfo(name = "name")

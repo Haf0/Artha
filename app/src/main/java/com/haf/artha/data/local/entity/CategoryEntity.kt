@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 data class CategoryEntity (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Int? = null,
+    val id: Int=0,
     @ColumnInfo(name = "name")
     val name: String,
     @ColumnInfo(name="color")

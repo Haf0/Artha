@@ -72,7 +72,8 @@ fun SetUsername(
 
 @Composable
 fun InputUsername(
-    modifier: Modifier = Modifier, context: Context,
+    modifier: Modifier = Modifier,
+    context: Context,
     navController: NavHostController,
     preferenceViewModel: PreferenceViewModel = hiltViewModel()
 ) {
@@ -102,10 +103,8 @@ fun InputUsername(
                 if (username.isNotEmpty()) {
                     preferenceViewModel.setUsername(username)
                     preferenceViewModel.setCurrentStep(1)
-                    Toast.makeText(context, username, Toast.LENGTH_SHORT).show()
                     navController.navigate(Screen.SetAccount.route)
                 }else{
-                    // show error message
                     Toast.makeText(context, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
                 }
             },
