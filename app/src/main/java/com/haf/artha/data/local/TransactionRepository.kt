@@ -12,7 +12,6 @@ class TransactionRepository @Inject constructor(
     private val accountDao: AccountDao
 ) {
 
-    // Insert a transaction and update the account balance accordingly
     suspend fun insertTransaction(transaction: TransactionEntity) {
         val newTransactionId = transactionDao.insert(transaction)
 
@@ -44,7 +43,6 @@ class TransactionRepository @Inject constructor(
         }
     }
 
-    // Update a transaction and adjust the account balance
     suspend fun updateTransaction(transaction: TransactionEntity) {
         val oldTransaction = transaction.transactionId?.let {
             transactionDao.getTransactionById(it)
