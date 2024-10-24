@@ -3,12 +3,13 @@ package com.haf.artha.data.local
 import com.haf.artha.data.local.db.AccountDao
 import com.haf.artha.data.local.entity.AccountEntity
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class AccountRepository(
+class AccountRepository @Inject constructor(
     private val accountDao: AccountDao
 ) {
-    suspend fun insertAccount(account: AccountEntity) {
-        accountDao.insert(account)
+    suspend fun insertAccount(accounts: List<AccountEntity>) {
+        accountDao.insert(accounts)
     }
 
     suspend fun updateAccount(account: AccountEntity) {
