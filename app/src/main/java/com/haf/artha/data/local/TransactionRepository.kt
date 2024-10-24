@@ -5,8 +5,9 @@ import com.haf.artha.data.local.db.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class TransactionRepository(
+class TransactionRepository @Inject constructor(
     private val transactionDao: TransactionDao,
     private val accountDao: AccountDao
 ) {
@@ -48,7 +49,6 @@ class TransactionRepository(
         val oldTransaction = transaction.transactionId?.let {
             transactionDao.getTransactionById(it)
         }
-
 
         if (oldTransaction != null) {
             // Revert the account balance for the old transaction
