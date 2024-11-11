@@ -1,5 +1,8 @@
 
+import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -49,5 +52,12 @@ object DateUtils {
         val date = Date(this)
         val format = SimpleDateFormat("EEEE, dd MM yyyy", Locale.getDefault())
         return format.format(date)
+    }
+
+    @SuppressLint("NewApi")
+    fun LocalDate.toTimestamp(): Long {
+        return this.atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
     }
 }

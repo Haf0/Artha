@@ -12,10 +12,7 @@ class TransactionRepository @Inject constructor(
     private val accountDao: AccountDao
 ) {
 
-    suspend fun insertTransaction(transaction: TransactionEntity) {
-        val newTransactionId = transactionDao.insert(transaction)
-
-        // Update the account balance based on the transaction type
+    suspend fun insertTransaction(transaction: TransactionEntity) { // Update the account balance based on the transaction type
         val account = accountDao.getAccountById(transaction.accountId)
         if (account != null) {
             when (transaction.transactionType) {
