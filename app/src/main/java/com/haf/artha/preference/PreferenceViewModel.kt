@@ -4,33 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PreferenceViewModel @Inject constructor(private val preferenceManager: PreferenceManager): ViewModel(){
-    private val _onboardingCompleted = MutableStateFlow(false)
-    val onboardingCompleted: StateFlow<Boolean> = _onboardingCompleted
-
-    private val _currentStep = MutableStateFlow(0)
-    val currentStep: StateFlow<Int> = _currentStep
-
-    init {
-        viewModelScope.launch {
-            preferenceManager.getOnboardingStatus().collect { isCompleted ->
-                _onboardingCompleted.value = isCompleted
-            }
-        }
-        viewModelScope.launch {
-            preferenceManager.getOnboardingStep().collect { step ->
-                _currentStep.value = step
-            }
-        }
-    }
-
     fun checkOnboardingStatus(): Flow<Pair<Boolean, Int>> {
         return combine(
             preferenceManager.getOnboardingStatus(),
