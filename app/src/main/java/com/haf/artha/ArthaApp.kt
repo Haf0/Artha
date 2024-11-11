@@ -67,7 +67,7 @@ fun ArthaApp(
         NavHost(
             navController = navController,
             startDestination = Screen.SplashScreen.route,
-            modifier = Modifier.padding(
+            modifier = modifier.padding(
                 if (showBottomBar) innerPadding else PaddingValues(
                     top = 0.dp,
                     start = 0.dp,
