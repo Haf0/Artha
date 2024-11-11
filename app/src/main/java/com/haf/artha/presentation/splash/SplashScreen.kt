@@ -46,8 +46,8 @@ fun SplashScreen(
                 } else {
                     val onboardingSteps = mapOf(
                         0 to Screen.SetUsername,
-                        1 to Screen.SetCategory,
-                        2 to Screen.SetAccount
+                        1 to Screen.SetAccount,
+                        2 to Screen.SetCategory
                     )
 
                     onboardingSteps[step]?.let { screen ->
