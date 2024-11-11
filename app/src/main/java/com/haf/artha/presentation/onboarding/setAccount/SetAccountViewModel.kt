@@ -13,6 +13,6 @@ class SetAccountViewModel @Inject constructor(
     private val accountRepository: AccountRepository
 ): ViewModel() {
     fun insertAccount(accounts: List<AccountEntity>) {
-        viewModelScope.launch { accountRepository.insertAccount(accounts) }
+        viewModelScope.launch { accountRepository.insertAccount(accounts.distinct()) }
     }
 }

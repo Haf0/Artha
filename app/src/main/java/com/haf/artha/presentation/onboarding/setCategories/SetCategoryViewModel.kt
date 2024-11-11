@@ -13,6 +13,6 @@ class SetCategoryViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository
 ): ViewModel() {
     fun insertCategory(categories: List<CategoryEntity>) {
-        viewModelScope.launch { categoryRepository.insertCategory(categories) }
+        viewModelScope.launch { categoryRepository.insertCategory(categories.distinct()) }
     }
 }
