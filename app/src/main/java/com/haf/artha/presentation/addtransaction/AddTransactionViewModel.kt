@@ -1,5 +1,6 @@
 package com.haf.artha.presentation.addtransaction
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haf.artha.data.local.AccountRepository
@@ -36,6 +37,7 @@ class AddTransactionViewModel @Inject constructor(
         amount: Double,
     ){
         viewModelScope.launch{
+            Log.d("insertvm", "addTransaction: transactionType: $type, name: $name, accountId: $accountId, categoryId: $categoryId, date: $date, note: $note, amount: $amount")
             transactionRepository.insertTransaction(
                 TransactionEntity(
                     0,
@@ -51,6 +53,18 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
+
+    fun transferFunds(
+        fromWalletId: Int,
+        toWalletId: Int,
+        amount: Double,
+        date: Long,
+        note: String
+    ) {
+        viewModelScope.launch {
+            transactionRepository.transferFunds(fromWalletId, toWalletId, amount, date, note)
+        }
+    }
 
     private val _categories = MutableStateFlow<UiState<List<CategoryEntity>>>(UiState.Loading)
     val categories = _categories.asStateFlow()

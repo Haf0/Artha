@@ -2,7 +2,9 @@
 
 package com.haf.artha.presentation.addtransaction
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,13 +41,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.haf.artha.data.local.entity.AccountEntity
 import com.haf.artha.data.local.entity.CategoryEntity
+import com.haf.artha.data.local.model.TransactionType
 import com.haf.artha.presentation.addtransaction.component.DateInputField
 import com.haf.artha.presentation.addtransaction.component.validateDate
 import com.haf.artha.presentation.common.UiState
@@ -64,7 +67,17 @@ fun AddTransactionScreen(
         when(it) {
             is UiState.Success -> {
                 val (categories, accounts) = it.data
-                AddTransactionContent(categories,accounts)
+                AddTransactionContent(
+                    categories,
+                    accounts,
+                    viewModel::addTransaction,
+                    viewModel::transferFunds,
+                    onBack = {
+                        Thread.sleep(2000)
+                        navController.popBackStack()
+                    },
+                    LocalContext.current
+                )
             }
             is UiState.Error -> {
                 // Handle Error
@@ -80,7 +93,11 @@ fun AddTransactionScreen(
 @Composable
 fun AddTransactionContent(
     categories: List<CategoryEntity>,
-    accounts : List<AccountEntity>
+    accounts : List<AccountEntity>,
+    insertTransaction: (TransactionType, String, Int, Int, Long, String, Double) -> Unit,
+    transferFunds: (Int, Int, Double, Long, String) -> Unit,
+    onBack: () -> Unit,
+    context: Context
 ) {
     var transactionType by remember { mutableStateOf("Income") }
     var transactionName by remember { mutableStateOf("") }
@@ -94,12 +111,11 @@ fun AddTransactionContent(
     var selectedToWallet by remember { mutableStateOf(AccountEntity(0,"E-wallet","E-wallet", 100000.0))}
 
     Log.d("categories", "AddTransactionContent: $categories")
-    var selectedCategory by remember { mutableStateOf(categories.first().name) }
+    var selectedCategory by remember { mutableStateOf(categories.first()) }
 
-
+    var isButtonEnabled by remember { mutableStateOf(true) }
 
     var errorMessage by remember { mutableStateOf("") }
-    var successMessage by remember { mutableStateOf<String?>(null) }
 
     Column (modifier = Modifier.padding(16.dp)) {
         // Segmented Button
@@ -125,6 +141,7 @@ fun AddTransactionContent(
             // Wallet Selection
             Text(text = "Select Wallet:")
             LazyRow {
+
                 items(accounts) { account ->
                     AccountItem(
                         account = account,
@@ -145,7 +162,7 @@ fun AddTransactionContent(
             ) {
 
                 OutlinedTextField(
-                    value = selectedCategory,
+                    value = selectedCategory.name,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Category") },
@@ -165,7 +182,7 @@ fun AddTransactionContent(
                         DropdownMenuItem(
                             text = { Text(category.name) },
                             onClick = {
-                                selectedCategory = category.name
+                                selectedCategory = category
                                 expanded = false
                             }
                         )
@@ -232,7 +249,47 @@ fun AddTransactionContent(
 
             // Add Button
             Button(
-                onClick = { /* Handle Add Transaction */ },
+                onClick = {
+                    Log.d("insertwalletid", "AddTransactionContent: $selectedWallet")
+                    if(isButtonEnabled){
+
+                        if (selectedWallet.id != 0){
+                            Log.d("insert", "AddTransactionContent: $transactionType")
+                            when(transactionType){
+                                "Income" -> insertTransaction(
+                                    TransactionType.INCOME,
+                                    transactionName,
+                                    selectedWallet.id,
+                                    selectedCategory.id,
+                                    convertDateStringToLong(transactionDate),
+                                    transactionNote,
+                                    transactionAmount.toDouble()
+                                )
+                                "Outcome" -> insertTransaction(
+                                    TransactionType.EXPENSE,
+                                    transactionName,
+                                    selectedWallet.id,
+                                    selectedCategory.id,
+                                    convertDateStringToLong(transactionDate),
+                                    transactionNote,
+                                    transactionAmount.toDouble()
+                                )
+                                "Transfer" -> {
+                                    transferFunds(
+                                        selectedFromWallet.id,
+                                        selectedToWallet.id,
+                                        transactionAmount.toDouble(),
+                                        convertDateStringToLong(transactionDate),
+                                        transactionNote
+                                    )
+                                }
+                            }
+                            onBack()
+                        }else{
+                            Toast.makeText(context, "Jangan lupa pilih akun", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Add Transaction")
@@ -286,7 +343,25 @@ fun AddTransactionContent(
 
             // Transfer Button
             Button(
-                onClick = { /* Handle Transfer */ },
+                onClick = {
+                    if(isButtonEnabled){
+                        if(selectedFromWallet.id != 0 || selectedToWallet.id != 0){
+                            transferFunds(
+                                selectedFromWallet.id,
+                                selectedToWallet.id,
+                                transactionAmount.toDouble(),
+                                convertDateStringToLong(transactionDate),
+                                transactionNote
+                            )
+                            onBack()
+                        }else{
+                            Toast.makeText(context, "Jangan lupa pilih akun", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+
+
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Transfer")
@@ -379,12 +454,8 @@ fun getTodayDate(): String {
     return formatter.format(Date())
 }
 
-
-@Preview
-@Composable
-fun preview(){
-    AddTransactionContent(
-        emptyList(),
-        emptyList()
-    )
+fun convertDateStringToLong(dateString: String): Long {
+    val formatter = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+    val date = formatter.parse(dateString)
+    return date?.time ?: 0L
 }
