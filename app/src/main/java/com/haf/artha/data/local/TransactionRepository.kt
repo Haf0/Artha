@@ -1,6 +1,7 @@
 package com.haf.artha.data.local
 import DateUtils
 import com.haf.artha.data.local.db.AccountDao
+import com.haf.artha.data.local.db.CategoryDao
 import com.haf.artha.data.local.db.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
@@ -9,7 +10,8 @@ import javax.inject.Inject
 
 class TransactionRepository @Inject constructor(
     private val transactionDao: TransactionDao,
-    private val accountDao: AccountDao
+    private val accountDao: AccountDao,
+    private val categoryDao: CategoryDao
 ) {
 
     suspend fun insertTransaction(transaction: TransactionEntity) { // Update the account balance based on the transaction type
@@ -40,6 +42,63 @@ class TransactionRepository @Inject constructor(
             }
         }
     }
+
+    //tranfer transaction function
+    suspend fun transferFunds(
+        fromWalletId: Int,
+        toWalletId: Int,
+        amount: Double,
+        date: Long,
+        note: String
+    ) {
+        val transferCategory = categoryDao.getCategoryByName("Transfer") // Assuming you have a method to get category by name
+        val transferCategoryId = transferCategory?.id ?: 0
+
+        val outgoingTransaction = TransactionEntity(
+            transactionId = 0,
+            accountId = fromWalletId,
+            categoryId = transferCategoryId,
+            transactionName  = "Transfer Out",
+            transactionDate = date,
+            transactionType = TransactionType.EXPENSE,
+            transactionNote = note,
+            transactionAmount = amount
+        )
+        val incomingTransaction = TransactionEntity(
+            transactionId = 0,
+            accountId = toWalletId,
+            categoryId = transferCategoryId,
+            transactionName  = "Transfer In",
+            transactionDate = date,
+            transactionType = TransactionType.INCOME,
+            transactionNote = note,
+            transactionAmount = amount
+        )
+        transactionDao.insert(outgoingTransaction)
+        transactionDao.insert(incomingTransaction)
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     suspend fun updateTransaction(transaction: TransactionEntity) {
         val oldTransaction = transaction.transactionId?.let {
