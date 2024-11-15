@@ -77,29 +77,6 @@ class TransactionRepository @Inject constructor(
         transactionDao.insert(outgoingTransaction)
         transactionDao.insert(incomingTransaction)
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     suspend fun updateTransaction(transaction: TransactionEntity) {
         val oldTransaction = transaction.transactionId?.let {
             transactionDao.getTransactionById(it)
