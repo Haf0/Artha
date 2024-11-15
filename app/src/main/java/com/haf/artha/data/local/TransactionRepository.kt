@@ -14,6 +14,7 @@ class TransactionRepository @Inject constructor(
 
     suspend fun insertTransaction(transaction: TransactionEntity) { // Update the account balance based on the transaction type
         val account = accountDao.getAccountById(transaction.accountId)
+        transactionDao.insert(transaction)
         if (account != null) {
             when (transaction.transactionType) {
                 TransactionType.INCOME -> {
