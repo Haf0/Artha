@@ -21,8 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.haf.artha.navigation.BottomNavigationBar
 import com.haf.artha.navigation.BottomNavigationItem
 import com.haf.artha.navigation.Screen
-import com.haf.artha.presentation.accoumt.AccountScreen
-import com.haf.artha.presentation.addtransaction.AddTransactionScreen
+import com.haf.artha.presentation.account.list.AccountScreen
 import com.haf.artha.presentation.home.HomeScreen
 import com.haf.artha.presentation.onboarding.setAccount.SetAccount
 import com.haf.artha.presentation.onboarding.setCategories.SetCategory
@@ -30,6 +29,8 @@ import com.haf.artha.presentation.onboarding.setUsername.SetUsername
 import com.haf.artha.presentation.overview.OverviewScreen
 import com.haf.artha.presentation.setting.SettingScreen
 import com.haf.artha.presentation.splash.SplashScreen
+import com.haf.artha.presentation.transaction.add.AddTransactionScreen
+import com.haf.artha.presentation.transaction.list.ListTransactionScreen
 
 @Composable
 fun ArthaApp(
@@ -113,6 +114,9 @@ fun ArthaApp(
                 AddTransactionScreen(navController = navController)
             }
 
+            composable(Screen.Transaction.route){
+                ListTransactionScreen(navController = navController)
+            }
 
 
         }
