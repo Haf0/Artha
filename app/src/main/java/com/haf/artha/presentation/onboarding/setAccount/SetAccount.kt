@@ -95,7 +95,11 @@ fun SetAccount (
                             AccountEntity(type = it, name = it, balance = 0.0)
                         }
                         setAccountViewModel.insertAccount(selectedAccountList)
-                        navController.navigate(Screen.SetCategory.route)
+                        navController.navigate(Screen.SetCategory.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
                     } else {
                         Toast.makeText(context, "Silahkan Pilih Minimal 1 Akun", Toast.LENGTH_SHORT).show()
                     }

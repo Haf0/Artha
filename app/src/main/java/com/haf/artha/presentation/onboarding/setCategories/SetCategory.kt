@@ -177,7 +177,11 @@ fun SetCategory(
                             )
                         }
                         setCategoryViewModel.insertCategory(selectedCategoryEntity)
-                        navController.navigate(Screen.Home.route)
+                        navController.navigate(Screen.Home.route){
+                            popUpTo(navController.graph.startDestinationId){
+                                inclusive = true
+                            }
+                        }
                     } else {
                         // show error message
                         Toast.makeText(context, "Silahkan pilih minimal satu kategori", Toast.LENGTH_SHORT).show()

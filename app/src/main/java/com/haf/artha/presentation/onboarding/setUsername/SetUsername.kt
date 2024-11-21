@@ -103,7 +103,11 @@ fun InputUsername(
                 if (username.isNotEmpty()) {
                     preferenceViewModel.setUsername(username)
                     preferenceViewModel.setCurrentStep(1)
-                    navController.navigate(Screen.SetAccount.route)
+                    navController.navigate(Screen.SetAccount.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
                 }else{
                     Toast.makeText(context, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
                 }
