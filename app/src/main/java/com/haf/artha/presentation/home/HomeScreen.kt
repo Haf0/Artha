@@ -30,7 +30,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
+import com.haf.artha.navigation.Screen
 import com.haf.artha.presentation.common.UiState
+import com.haf.artha.presentation.component.LoadingIndicator
 import com.haf.artha.presentation.home.component.BalanceItem
 import com.haf.artha.presentation.home.component.IncomeOutcomeItem
 import com.haf.artha.presentation.home.component.TransactionHistoryItem
@@ -46,19 +48,17 @@ fun HomeScreen(
     val homeState by viewModel.uiState.collectAsState()
     when(homeState){
         is UiState.Loading -> {
-            //TODO loading state
-            Log.d("homeScreen", "HomeScreen: loading")
+            LoadingIndicator()
         }
         is UiState.Error -> {
             Log.d("homeScreen", "HomeScreen: loading")
-            //TODO error state
         }
         is UiState.Success -> {
             Log.d("homeScreen", "HomeScreen: ${(homeState as UiState.Success).data}")
             HomeScreenContent(
                 modifier = modifier,
                 onNavigateToListTransaction = {
-                    //TODO list transaction
+                    navController.navigate(Screen.Transaction.route)
                 },
                 onNavigateToDetailTransaction = {
                     //TODO detail transaction
