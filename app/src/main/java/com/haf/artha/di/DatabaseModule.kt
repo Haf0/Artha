@@ -2,10 +2,10 @@ package com.haf.artha.di
 
 import android.content.Context
 import androidx.room.Room
-import com.haf.artha.data.local.db.AccountDao
+import com.haf.artha.data.local.db.dao.AccountDao
 import com.haf.artha.data.local.db.AppDatabase
-import com.haf.artha.data.local.db.CategoryDao
-import com.haf.artha.data.local.db.TransactionDao
+import com.haf.artha.data.local.db.dao.CategoryDao
+import com.haf.artha.data.local.db.dao.TransactionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

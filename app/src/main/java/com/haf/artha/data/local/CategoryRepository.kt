@@ -1,6 +1,6 @@
 package com.haf.artha.data.local
 
-import com.haf.artha.data.local.db.CategoryDao
+import com.haf.artha.data.local.db.dao.CategoryDao
 import com.haf.artha.data.local.entity.CategoryEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

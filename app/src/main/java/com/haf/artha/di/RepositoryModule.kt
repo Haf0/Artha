@@ -3,9 +3,9 @@ package com.haf.artha.di
 import com.haf.artha.data.local.AccountRepository
 import com.haf.artha.data.local.CategoryRepository
 import com.haf.artha.data.local.TransactionRepository
-import com.haf.artha.data.local.db.AccountDao
-import com.haf.artha.data.local.db.CategoryDao
-import com.haf.artha.data.local.db.TransactionDao
+import com.haf.artha.data.local.db.dao.AccountDao
+import com.haf.artha.data.local.db.dao.CategoryDao
+import com.haf.artha.data.local.db.dao.TransactionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

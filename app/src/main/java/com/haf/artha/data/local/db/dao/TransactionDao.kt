@@ -1,4 +1,4 @@
-package com.haf.artha.data.local.db
+package com.haf.artha.data.local.db.dao
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -4,6 +4,9 @@ package com.haf.artha.data.local.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.haf.artha.data.local.db.dao.AccountDao
+import com.haf.artha.data.local.db.dao.CategoryDao
+import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.AccountEntity
 import com.haf.artha.data.local.entity.CategoryEntity
 import com.haf.artha.data.local.entity.TransactionEntity
