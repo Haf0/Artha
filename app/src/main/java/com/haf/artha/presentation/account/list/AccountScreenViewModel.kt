@@ -1,4 +1,4 @@
-package com.haf.artha.presentation.accoumt
+package com.haf.artha.presentation.account.list
 
 import androidx.lifecycle.ViewModel
 import com.haf.artha.data.local.AccountRepository

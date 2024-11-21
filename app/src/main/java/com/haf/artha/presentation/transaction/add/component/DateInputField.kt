@@ -1,4 +1,4 @@
-package com.haf.artha.presentation.addtransaction.component
+package com.haf.artha.presentation.transaction.add.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

@@ -1,4 +1,4 @@
-package com.haf.artha.presentation.addtransaction
+package com.haf.artha.presentation.transaction.add
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

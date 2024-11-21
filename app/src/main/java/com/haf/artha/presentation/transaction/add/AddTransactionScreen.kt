@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.haf.artha.presentation.addtransaction
+package com.haf.artha.presentation.transaction.add
 
 import DateUtils.convertDateStringToLong
 import DateUtils.getTodayDate
@@ -51,10 +51,10 @@ import androidx.navigation.NavHostController
 import com.haf.artha.data.local.entity.AccountEntity
 import com.haf.artha.data.local.entity.CategoryEntity
 import com.haf.artha.data.local.model.TransactionType
-import com.haf.artha.presentation.addtransaction.component.DateInputField
-import com.haf.artha.presentation.addtransaction.component.validateDate
 import com.haf.artha.presentation.common.UiState
 import com.haf.artha.presentation.component.LoadingIndicator
+import com.haf.artha.presentation.transaction.add.component.DateInputField
+import com.haf.artha.presentation.transaction.add.component.validateDate
 import com.haf.artha.utils.CurrencyUtils
 
 

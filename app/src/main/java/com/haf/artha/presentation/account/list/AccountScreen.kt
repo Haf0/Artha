@@ -1,4 +1,4 @@
-package com.haf.artha.presentation.accoumt
+package com.haf.artha.presentation.account.list
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
