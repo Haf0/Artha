@@ -67,8 +67,8 @@ fun InOutItem(
                 modifier = modifier.padding(8.dp)
             ){
 
-                Text(text = if (isIncome) "Income" else "Outcome")
-                Text(text = total, style = MaterialTheme.typography.titleSmall)
+                Text(text = if (isIncome) "Pendapatan" else "Pengeluaran" , style =MaterialTheme.typography.titleSmall)
+                Text(text = total, style = MaterialTheme.typography.titleSmall, modifier = modifier.padding(top = 4.dp))
 
             }
         }
