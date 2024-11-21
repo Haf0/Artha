@@ -46,6 +46,7 @@ class AddTransactionViewModel @Inject constructor(
                     name,
                     date,
                     type,
+                    null,
                     note,
                     amount
                 )
@@ -55,14 +56,27 @@ class AddTransactionViewModel @Inject constructor(
 
 
     fun transferFunds(
-        fromWalletId: Int,
-        toWalletId: Int,
+        fromAccountId: Int,
+        toAccountId: Int,
         amount: Double,
-        date: Long,
-        note: String
+        date: Long
     ) {
         viewModelScope.launch {
-            transactionRepository.transferFunds(fromWalletId, toWalletId, amount, date, note)
+            val transferCategory = categoryRepository.getCategoryByName("Transfer") // Assuming you have a method to get category by name
+            val transferCategoryId = transferCategory?.id ?: 0
+            transactionRepository.insertTransaction(
+                TransactionEntity(
+                    0,
+                    fromAccountId,
+                    transferCategoryId,
+                    "Transfer to Another Account",
+                    date,
+                    TransactionType.TRANSFER,
+                    toAccountId,
+                    "Transfer to Another Account",
+                    amount
+                )
+            )
         }
     }
 
@@ -71,7 +85,6 @@ class AddTransactionViewModel @Inject constructor(
 
     private val _accounts = MutableStateFlow<UiState<List<AccountEntity>>>(UiState.Loading)
     val accounts = _accounts.asStateFlow()
-
     val uiState: StateFlow<UiState<Pair<List<CategoryEntity>, List<AccountEntity>>>> = combine(_categories, _accounts) { categories, accounts ->
         if (categories is UiState.Success && accounts is UiState.Success) {
             UiState.Success(Pair(categories.data, accounts.data))
@@ -98,6 +111,7 @@ class AddTransactionViewModel @Inject constructor(
         viewModelScope.launch {
             accountRepository.getAllAccounts().collect{
                 _accounts.value = UiState.Success(it)
+                Log.d("getCategories", "categories: ${it}")
             }
         }
     }

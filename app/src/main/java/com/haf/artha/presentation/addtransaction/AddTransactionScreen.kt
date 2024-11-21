@@ -95,7 +95,7 @@ fun AddTransactionContent(
     categories: List<CategoryEntity>,
     accounts : List<AccountEntity>,
     insertTransaction: (TransactionType, String, Int, Int, Long, String, Double) -> Unit,
-    transferFunds: (Int, Int, Double, Long, String) -> Unit,
+    transferFunds: (Int, Int, Double, Long) -> Unit,
     onBack: () -> Unit,
     context: Context
 ) {
@@ -274,15 +274,6 @@ fun AddTransactionContent(
                                     transactionNote,
                                     transactionAmount.toDouble()
                                 )
-                                "Transfer" -> {
-                                    transferFunds(
-                                        selectedFromWallet.id,
-                                        selectedToWallet.id,
-                                        transactionAmount.toDouble(),
-                                        convertDateStringToLong(transactionDate),
-                                        transactionNote
-                                    )
-                                }
                             }
                             onBack()
                         }else{
@@ -322,7 +313,6 @@ fun AddTransactionContent(
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(8.dp))
 
             // Amount Input for Transfer
@@ -350,8 +340,7 @@ fun AddTransactionContent(
                                 selectedFromWallet.id,
                                 selectedToWallet.id,
                                 transactionAmount.toDouble(),
-                                convertDateStringToLong(transactionDate),
-                                transactionNote
+                                convertDateStringToLong(transactionDate)
                             )
                             onBack()
                         }else{
