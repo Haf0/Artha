@@ -1,39 +1,38 @@
 package com.haf.artha.data.local
 import DateUtils
+import android.util.Log
 import com.haf.artha.data.local.db.AccountDao
-import com.haf.artha.data.local.db.CategoryDao
 import com.haf.artha.data.local.db.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class TransactionRepository @Inject constructor(
     private val transactionDao: TransactionDao,
-    private val accountDao: AccountDao,
-    private val categoryDao: CategoryDao
+    private val accountDao: AccountDao
 ) {
 
     suspend fun insertTransaction(transaction: TransactionEntity) { // Update the account balance based on the transaction type
         val account = accountDao.getAccountById(transaction.accountId)
         transactionDao.insert(transaction)
         if (account != null) {
-            when (transaction.transactionType) {
+            when (transaction.type) {
                 TransactionType.INCOME -> {
-                    val updatedBalance = account.balance + transaction.transactionAmount
+                    val updatedBalance = account.balance + transaction.amount
                     accountDao.update(account.copy(balance = updatedBalance))
                 }
                 TransactionType.EXPENSE -> {
-                    val updatedBalance = account.balance - transaction.transactionAmount
+                    val updatedBalance = account.balance - transaction.amount
                     accountDao.update(account.copy(balance = updatedBalance))
                 }
                 TransactionType.TRANSFER -> {
                     val sourceAccount = accountDao.getAccountById(transaction.accountId)
-                    val destinationAccount = accountDao.getAccountById(transaction.categoryId) // Assuming categoryId refers to destination account
-
+                    val destinationAccount = transaction.toAccountId?.let { accountDao.getAccountById(it) }
                     if (sourceAccount != null && destinationAccount != null) {
-                        val updatedSourceBalance = sourceAccount.balance - transaction.transactionAmount
-                        val updatedDestinationBalance = destinationAccount.balance + transaction.transactionAmount
+                        val updatedSourceBalance = sourceAccount.balance - transaction.amount
+                        val updatedDestinationBalance = destinationAccount.balance + transaction.amount
 
                         accountDao.update(sourceAccount.copy(balance = updatedSourceBalance))
                         accountDao.update(destinationAccount.copy(balance = updatedDestinationBalance))
@@ -42,75 +41,39 @@ class TransactionRepository @Inject constructor(
             }
         }
     }
-
-    //tranfer transaction function
-    suspend fun transferFunds(
-        fromWalletId: Int,
-        toWalletId: Int,
-        amount: Double,
-        date: Long,
-        note: String
-    ) {
-        val transferCategory = categoryDao.getCategoryByName("Transfer") // Assuming you have a method to get category by name
-        val transferCategoryId = transferCategory?.id ?: 0
-
-        val outgoingTransaction = TransactionEntity(
-            transactionId = 0,
-            accountId = fromWalletId,
-            categoryId = transferCategoryId,
-            transactionName  = "Transfer Out",
-            transactionDate = date,
-            transactionType = TransactionType.EXPENSE,
-            transactionNote = note,
-            transactionAmount = amount
-        )
-        val incomingTransaction = TransactionEntity(
-            transactionId = 0,
-            accountId = toWalletId,
-            categoryId = transferCategoryId,
-            transactionName  = "Transfer In",
-            transactionDate = date,
-            transactionType = TransactionType.INCOME,
-            transactionNote = note,
-            transactionAmount = amount
-        )
-        transactionDao.insert(outgoingTransaction)
-        transactionDao.insert(incomingTransaction)
-    }
+    /* TODO need to change delete the transaction by ID then insert the as the new transaction*/
     suspend fun updateTransaction(transaction: TransactionEntity) {
-        val oldTransaction = transaction.transactionId?.let {
+        val oldTransaction = transaction.transactionId.let {
             transactionDao.getTransactionById(it)
         }
 
-        if (oldTransaction != null) {
-            // Revert the account balance for the old transaction
-            val account = accountDao.getAccountById(oldTransaction.accountId)
-            if (account != null) {
-                when (oldTransaction.transactionType) {
-                    TransactionType.INCOME -> {
-                        accountDao.update(account.copy(balance = account.balance - oldTransaction.transactionAmount))
-                    }
-                    TransactionType.EXPENSE -> {
-                        accountDao.update(account.copy(balance = account.balance + oldTransaction.transactionAmount))
-                    }
-                    TransactionType.TRANSFER -> {
-                        val sourceAccount = accountDao.getAccountById(oldTransaction.accountId)
-                        val destinationAccount = accountDao.getAccountById(oldTransaction.categoryId)
+        // Revert the account balance for the old transaction
+        val account = accountDao.getAccountById(oldTransaction.accountId)
+        if (account != null) {
+            when (oldTransaction.type) {
+                TransactionType.INCOME -> {
+                    accountDao.update(account.copy(balance = account.balance - oldTransaction.amount))
+                }
+                TransactionType.EXPENSE -> {
+                    accountDao.update(account.copy(balance = account.balance + oldTransaction.amount))
+                }
+                TransactionType.TRANSFER -> {
+                    val sourceAccount = accountDao.getAccountById(oldTransaction.accountId)
+                    val destinationAccount = accountDao.getAccountById(oldTransaction.categoryId)
 
-                        if (sourceAccount != null && destinationAccount != null) {
-                            accountDao.update(sourceAccount.copy(balance = sourceAccount.balance + oldTransaction.transactionAmount))
-                            accountDao.update(destinationAccount.copy(balance = destinationAccount.balance - oldTransaction.transactionAmount))
-                        }
+                    if (sourceAccount != null && destinationAccount != null) {
+                        accountDao.update(sourceAccount.copy(balance = sourceAccount.balance + oldTransaction.amount))
+                        accountDao.update(destinationAccount.copy(balance = destinationAccount.balance - oldTransaction.amount))
                     }
                 }
             }
-
-            // Update the transaction
-            transactionDao.update(transaction)
-
-            // Update the account balance for the new transaction
-            insertTransaction(transaction)
         }
+
+        // Update the transaction
+        transactionDao.update(transaction)
+
+        // Update the account balance for the new transaction
+        insertTransaction(transaction)
     }
 
     // Delete a transaction and update the account balance accordingly
@@ -119,22 +82,22 @@ class TransactionRepository @Inject constructor(
 
         val account = accountDao.getAccountById(transaction.accountId)
         if (account != null) {
-            when (transaction.transactionType) {
+            when (transaction.type) {
                 TransactionType.INCOME -> {
-                    val updatedBalance = account.balance - transaction.transactionAmount
+                    val updatedBalance = account.balance - transaction.amount
                     accountDao.update(account.copy(balance = updatedBalance))
                 }
                 TransactionType.EXPENSE -> {
-                    val updatedBalance = account.balance + transaction.transactionAmount
+                    val updatedBalance = account.balance + transaction.amount
                     accountDao.update(account.copy(balance = updatedBalance))
                 }
                 TransactionType.TRANSFER -> {
                     val sourceAccount = accountDao.getAccountById(transaction.accountId)
-                    val destinationAccount = accountDao.getAccountById(transaction.categoryId)
+                    val destinationAccount = transaction.toAccountId?.let { accountDao.getAccountById(it) }
 
                     if (sourceAccount != null && destinationAccount != null) {
-                        val updatedSourceBalance = sourceAccount.balance + transaction.transactionAmount
-                        val updatedDestinationBalance = destinationAccount.balance - transaction.transactionAmount
+                        val updatedSourceBalance = sourceAccount.balance + transaction.amount
+                        val updatedDestinationBalance = destinationAccount.balance - transaction.amount
 
                         accountDao.update(sourceAccount.copy(balance = updatedSourceBalance))
                         accountDao.update(destinationAccount.copy(balance = updatedDestinationBalance))
@@ -161,5 +124,34 @@ class TransactionRepository @Inject constructor(
         return transactionDao.getTransactionsBySpecificMonth(startOfMonth, endOfMonth)
     }
 
+    // Fetch transactions for a this week
+    fun getTransactionsByWeek(timestamp: Long): Flow<List<TransactionEntity>> {
+        val (startOfWeek, endOfWeek) = DateUtils.getStartAndEndOfCurrentWeek(timestamp)
+        return transactionDao.getTransactionsBySpecificWeek(startOfWeek, endOfWeek)
+    }
 
+    // Fetch transactions for a last week
+    fun getTransactionsByLastWeek(timestamp: Long): Flow<List<TransactionEntity>> {
+        val (startOfWeek, endOfWeek) = DateUtils.getStartAndEndOfLastWeek(timestamp)
+        return transactionDao.getTransactionsBySpecificWeek(startOfWeek, endOfWeek)
+    }
+
+    // Fetch the total income for this month
+    fun getTotalIncomeThisMonth(): Flow<Double> {
+        val (startOfMonth, endOfMonth) = DateUtils.getStartAndEndOfSpecificMonth(DateUtils.getTodayTimestamp())
+        return transactionDao.getTotalIncomeThisMonth(startOfMonth, endOfMonth, TransactionType.INCOME)
+            .onEach { Log.d("TransactionRepository", "getTotalIncomeThisMonth: $it") }
+    }
+
+    // Fetch the total expense for this month
+    fun getTotalExpenseThisMonth(): Flow<Double> {
+        val (startOfMonth, endOfMonth) = DateUtils.getStartAndEndOfSpecificMonth(DateUtils.getTodayTimestamp())
+        return transactionDao.getTotalExpenseThisMonth(startOfMonth, endOfMonth)
+            .onEach { Log.d("TransactionRepository", "getTotalExpenseThisMonth: $it") }
+    }
+
+    fun getRecentTransactions(): Flow<List<TransactionEntity>> {
+        return transactionDao.getRecentTransactions()
+            .onEach { Log.d("TransactionRepository", "getRecentTransactions: $it") }
+    }
 }
