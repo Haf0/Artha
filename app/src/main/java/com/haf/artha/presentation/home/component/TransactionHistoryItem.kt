@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,7 @@ fun TransactionHistoryItem(
             Column(
                 modifier = modifier.fillMaxHeight()
             ) {
-                Text(text = title,modifier.width(150.dp) , maxLines = 1 , overflow = TextOverflow.Ellipsis)
+                Text(text = title,modifier.width(150.dp) , maxLines = 1 , overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Medium, color = Color.Black)
                 Text(text = date, modifier = modifier.padding(top = 8.dp))
             }
             Spacer(Modifier.weight(1f).fillMaxHeight())
