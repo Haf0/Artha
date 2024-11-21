@@ -15,7 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -81,10 +80,8 @@ class AddTransactionViewModel @Inject constructor(
     }
 
     private val _categories = MutableStateFlow<UiState<List<CategoryEntity>>>(UiState.Loading)
-    val categories = _categories.asStateFlow()
-
     private val _accounts = MutableStateFlow<UiState<List<AccountEntity>>>(UiState.Loading)
-    val accounts = _accounts.asStateFlow()
+
     val uiState: StateFlow<UiState<Pair<List<CategoryEntity>, List<AccountEntity>>>> = combine(_categories, _accounts) { categories, accounts ->
         if (categories is UiState.Success && accounts is UiState.Success) {
             UiState.Success(Pair(categories.data, accounts.data))
@@ -94,6 +91,8 @@ class AddTransactionViewModel @Inject constructor(
             UiState.Loading
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, UiState.Loading)
+
+
     init {
         fetchCategories()
         fetchAccounts()
@@ -113,6 +112,32 @@ class AddTransactionViewModel @Inject constructor(
                 _accounts.value = UiState.Success(it)
                 Log.d("getCategories", "categories: ${it}")
             }
+        }
+    }
+
+
+
+
+    fun editTransaction(
+        transaction: TransactionEntity,
+        name: String,
+        accountId: Int,
+        categoryId: Int,
+        date: Long,
+        note: String,
+        amount: Double
+    ) {
+        viewModelScope.launch {
+            transactionRepository.updateTransaction(
+                transaction.copy(
+                    name =  name,
+                    accountId = accountId,
+                    categoryId = categoryId,
+                    date = date,
+                    note = note,
+                    amount = amount
+                )
+            )
         }
     }
 
