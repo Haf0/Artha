@@ -16,7 +16,7 @@ import com.haf.artha.utils.TransactionTypeConverter
         CategoryEntity::class,
         TransactionEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(TransactionTypeConverter::class, AccountTypeConverter::class)

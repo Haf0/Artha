@@ -26,6 +26,13 @@ import kotlinx.parcelize.Parcelize
             childColumns = ["category_id"],
             onDelete = CASCADE,
             onUpdate = CASCADE
+        ),
+        ForeignKey(
+            entity = AccountEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["to_account_id"],
+            onDelete = CASCADE,
+            onUpdate = CASCADE
         )
     ]
 )
@@ -43,6 +50,8 @@ data class TransactionEntity(
     val transactionDate: Long,
     @ColumnInfo(name = "type")
     val transactionType: TransactionType,
+    @ColumnInfo(name = "to_account_id", index = true)
+    val toAccountId: Int?,
     @ColumnInfo(name = "note")
     val transactionNote: String,
     @ColumnInfo(name = "amount")
