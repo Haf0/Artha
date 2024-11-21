@@ -45,15 +45,15 @@ data class TransactionEntity(
     @ColumnInfo(name = "category_id", index = true)
     val categoryId: Int,
     @ColumnInfo(name = "name")
-    val transactionName: String,
+    val name: String,
     @ColumnInfo(name = "date")
-    val transactionDate: Long,
+    val date: Long,
     @ColumnInfo(name = "type")
-    val transactionType: TransactionType,
+    val type: TransactionType,
     @ColumnInfo(name = "to_account_id", index = true)
     val toAccountId: Int?,
     @ColumnInfo(name = "note")
-    val transactionNote: String,
+    val note: String,
     @ColumnInfo(name = "amount")
-    val transactionAmount: Double
+    val amount: Double
 ): Parcelable
