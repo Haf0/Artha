@@ -47,7 +47,9 @@ fun BottomNavigationBar( navController: NavController) {
                     )
                 },
                 label = {
-                    Text(item.label)
+                    if(currentRoute == item.screen.route){
+                        Text(item.label)
+                    }
                 },
                 onClick = {
                     navController.navigate(item.screen.route) {
