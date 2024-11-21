@@ -16,8 +16,8 @@ class TransactionTypeConverter {
     @TypeConverter
     fun toTransactionType(value: String): TransactionType {
         return when (value) {
-            "Income" -> TransactionType.INCOME
-            "Expense" -> TransactionType.EXPENSE
+            "Pendapatan" -> TransactionType.INCOME
+            "Pengeluaran" -> TransactionType.EXPENSE
             "Transfer" -> TransactionType.TRANSFER
             else -> throw IllegalArgumentException("Unknown TransactionType: $value")
         }
