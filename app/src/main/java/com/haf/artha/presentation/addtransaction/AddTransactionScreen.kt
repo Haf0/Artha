@@ -2,6 +2,8 @@
 
 package com.haf.artha.presentation.addtransaction
 
+import DateUtils.convertDateStringToLong
+import DateUtils.getTodayDate
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -53,11 +55,10 @@ import com.haf.artha.presentation.addtransaction.component.DateInputField
 import com.haf.artha.presentation.addtransaction.component.validateDate
 import com.haf.artha.presentation.common.UiState
 import com.haf.artha.presentation.component.LoadingIndicator
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.haf.artha.utils.CurrencyUtils
 
+
+/*TODO I need to add edit transaction feature*/
 @Composable
 fun AddTransactionScreen(
     navController: NavHostController,
@@ -421,7 +422,7 @@ fun AccountItem(
             )
 
             Text(
-                text = formatAmount(account.balance),
+                text = CurrencyUtils.formatAmount(account.balance),
                 style = MaterialTheme.typography.labelSmall,
                 color = if (isSelected) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.onSurfaceVariant
@@ -430,21 +431,3 @@ fun AccountItem(
     }
 }
 
-
-
-private fun formatAmount(amount: Double): String {
-    val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
-    return formatter.format(amount)
-}
-
-// Utility function for getting today's date
-fun getTodayDate(): String {
-    val formatter = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
-    return formatter.format(Date())
-}
-
-fun convertDateStringToLong(dateString: String): Long {
-    val formatter = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
-    val date = formatter.parse(dateString)
-    return date?.time ?: 0L
-}
