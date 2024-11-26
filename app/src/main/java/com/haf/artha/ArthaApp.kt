@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.haf.artha.navigation.BottomNavigationBar
 import com.haf.artha.navigation.BottomNavigationItem
 import com.haf.artha.navigation.Screen
+import com.haf.artha.presentation.account.add.AddAccountScreen
 import com.haf.artha.presentation.account.list.AccountScreen
 import com.haf.artha.presentation.home.HomeScreen
 import com.haf.artha.presentation.onboarding.setAccount.SetAccount
@@ -118,7 +119,10 @@ fun ArthaApp(
                 ListTransactionScreen(navController = navController)
             }
 
-
+            composable(Screen.AddAccount.route){ backStackEntry ->
+                val accountId =backStackEntry.arguments?.getString("accountId")?.toIntOrNull()
+                AddAccountScreen(navController = navController,accountId = accountId)
+            }
         }
     }
 }

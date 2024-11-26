@@ -7,10 +7,15 @@ sealed class Screen(
     object SetAccount : Screen("setAccount")
     object SetUsername : Screen("setUsername")
     object Home : Screen("home")
+
     object Account : Screen("account")
+    object AddAccount : Screen("addAccount/accountId={accountId}"){
+        fun createRoute(accountId: Int? = null) = "addAccount/accountId=$accountId"
+    }
+
     object Transaction : Screen("transaction")
     object AddTransaction : Screen("addTransaction")
-    object AddAccount : Screen("addAccount")
+
     object AddCategory : Screen("addCategory")
     object Setting : Screen("setting")
     object About : Screen("about")
