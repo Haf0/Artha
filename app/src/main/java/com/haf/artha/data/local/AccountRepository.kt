@@ -9,9 +9,13 @@ class AccountRepository @Inject constructor(
     private val accountDao: AccountDao
 ) {
     suspend fun insertAccount(accounts: List<AccountEntity>) {
-        accountDao.insert(accounts)
+        accountDao.multiInsert(accounts)
     }
 
+    suspend fun singleInsertAccount(name: String, balance: Double) {
+        val account = AccountEntity(name = name, type = name, balance = balance)
+        accountDao.singleInsert(account)
+    }
     suspend fun updateAccount(account: AccountEntity) {
         accountDao.update(account)
     }
