@@ -20,8 +20,8 @@ class AccountRepository @Inject constructor(
         accountDao.update(account)
     }
 
-    suspend fun deleteAccount(account: AccountEntity) {
-        accountDao.delete(account)
+    suspend fun deleteAccount(accountId: Int) {
+        accountDao.delete(accountId)
     }
 
     fun getAllAccounts(): Flow<List<AccountEntity>> {

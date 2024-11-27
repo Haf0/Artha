@@ -34,4 +34,10 @@ class AddAccountScreenViewModel @Inject constructor(
             accountRepository.updateAccount(account)
         }
     }
+
+    fun deleteAccount(accountId: Int) {
+        viewModelScope.launch {
+            accountRepository.deleteAccount(accountId)
+        }
+    }
 }

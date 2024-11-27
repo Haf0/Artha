@@ -1,7 +1,6 @@
 package com.haf.artha.data.local.db.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -20,9 +19,6 @@ interface AccountDao {
     @Update
     suspend fun update(account: AccountEntity)
 
-    @Delete
-    suspend fun delete(account: AccountEntity)
-
     @Query("SELECT * FROM account WHERE id = :accountId")
     suspend fun getAccountById(accountId: Int): AccountEntity?
 
@@ -31,4 +27,7 @@ interface AccountDao {
 
     @Query("SELECT SUM(account_balance) FROM account")
     fun getTotalBalance(): Flow<Double>
+
+    @Query("DELETE FROM account WHERE id = :accountId")
+    suspend fun delete(accountId: Int)
 }
