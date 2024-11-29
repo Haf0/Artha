@@ -16,7 +16,7 @@ sealed class Screen(
     object Transaction : Screen("transaction")
     object AddTransaction : Screen("addTransaction")
 
-    object AddCategory : Screen("addCategory")
+    object Category : Screen("category")
     object Setting : Screen("setting")
     object About : Screen("about")
     object Notification : Screen("notification")
