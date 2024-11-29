@@ -6,6 +6,7 @@ import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -139,15 +140,13 @@ class TransactionRepository @Inject constructor(
     // Fetch the total income for this month
     fun getTotalIncomeThisMonth(): Flow<Double> {
         val (startOfMonth, endOfMonth) = DateUtils.getStartAndEndOfSpecificMonth(DateUtils.getTodayTimestamp())
-        return transactionDao.getTotalIncomeThisMonth(startOfMonth, endOfMonth, TransactionType.INCOME)
-            .onEach { Log.d("TransactionRepository", "getTotalIncomeThisMonth: $it") }
+        return transactionDao.getTotalIncomeThisMonth(startOfMonth, endOfMonth, TransactionType.INCOME).map { it ?: 0.0 }
     }
 
     // Fetch the total expense for this month
     fun getTotalExpenseThisMonth(): Flow<Double> {
         val (startOfMonth, endOfMonth) = DateUtils.getStartAndEndOfSpecificMonth(DateUtils.getTodayTimestamp())
-        return transactionDao.getTotalExpenseThisMonth(startOfMonth, endOfMonth)
-            .onEach { Log.d("TransactionRepository", "getTotalExpenseThisMonth: $it") }
+        return transactionDao.getTotalExpenseThisMonth(startOfMonth, endOfMonth).map { it ?: 0.0 }
     }
 
     fun getRecentTransactions(): Flow<List<TransactionEntity>> {

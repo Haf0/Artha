@@ -39,11 +39,11 @@ interface TransactionDao {
 
     //SUM this month Income transactions
     @Query("SELECT SUM(amount) FROM transactions WHERE type = :type AND date BETWEEN :startOfMonth AND :endOfMonth")
-    fun getTotalIncomeThisMonth(startOfMonth: Long, endOfMonth: Long, type:TransactionType): Flow<Double>
+    fun getTotalIncomeThisMonth(startOfMonth: Long, endOfMonth: Long, type:TransactionType): Flow<Double?>
 
     //SUM this month Expense transactions
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'Pengeluaran' AND date BETWEEN :startOfMonth AND :endOfMonth")
-    fun getTotalExpenseThisMonth(startOfMonth: Long, endOfMonth: Long): Flow<Double>
+    fun getTotalExpenseThisMonth(startOfMonth: Long, endOfMonth: Long): Flow<Double?>
 
     @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT 15")
     fun getRecentTransactions(): Flow<List<TransactionEntity>>
