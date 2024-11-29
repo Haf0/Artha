@@ -1,5 +1,6 @@
 package com.haf.artha
 
+import ListCategoryScreen
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -122,6 +123,10 @@ fun ArthaApp(
             composable(Screen.AddAccount.route){ backStackEntry ->
                 val accountId =backStackEntry.arguments?.getString("accountId")?.toIntOrNull()
                 AddAccountScreen(navController = navController,accountId = accountId)
+            }
+
+            composable(Screen.Category.route){
+                ListCategoryScreen(navController = navController)
             }
         }
     }
