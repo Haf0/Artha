@@ -13,7 +13,7 @@ data class CategoryEntity (
     @ColumnInfo(name = "id")
     val id: Int=0,
     @ColumnInfo(name = "name")
-    val name: String,
+    var name: String,
     @ColumnInfo(name="color")
-    val color: Int
+    var color: Int
 ) : Parcelable
