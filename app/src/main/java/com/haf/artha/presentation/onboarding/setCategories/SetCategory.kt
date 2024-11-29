@@ -1,5 +1,6 @@
 package com.haf.artha.presentation.onboarding.setCategories
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +40,7 @@ import com.haf.artha.preference.PreferenceViewModel
 import com.haf.artha.presentation.onboarding.component.OnboardingItem
 import kotlin.random.Random
 
+@SuppressLint("MutableCollectionMutableState")
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SetCategory(
@@ -48,7 +50,7 @@ fun SetCategory(
     setCategoryViewModel: SetCategoryViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    var dummyList =
+    val dummyList =
         mutableListOf(
             "Makan",
             "Transportasi",
@@ -67,7 +69,7 @@ fun SetCategory(
             "Lainnya"
         )
 
-    var dummies by remember { mutableStateOf(dummyList) }
+    val dummies by remember { mutableStateOf(dummyList) }
     val selectedList by remember { mutableStateOf(mutableListOf<String>()) }
 
 
