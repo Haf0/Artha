@@ -126,7 +126,7 @@ fun ArthaApp(
             }
 
             composable(Screen.Category.route){
-                ListCategoryScreen(navController = navController)
+                ListCategoryScreen()
             }
         }
     }
