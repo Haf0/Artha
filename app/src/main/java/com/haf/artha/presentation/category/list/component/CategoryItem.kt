@@ -1,9 +1,11 @@
 package com.haf.artha.presentation.category.list.component
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,9 +28,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,10 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.haf.artha.data.local.entity.CategoryEntity
 import com.haf.artha.presentation.category.list.ListCategoryViewModel
+import com.haf.artha.presentation.component.DeleteConfirmationDialog
 import com.haf.artha.ui.theme.listColorOption
 
 @Composable
 fun CategoryItem(
+    modifier: Modifier,
     items: List<CategoryEntity>,
     viewModel: ListCategoryViewModel = hiltViewModel()
 ) {
@@ -52,16 +59,43 @@ fun CategoryItem(
     val showColorOptions = remember { mutableStateMapOf<Int, Boolean>() }
     val colorsOption = listColorOption
     val keyboardController = LocalSoftwareKeyboardController.current
+    var name by remember { mutableStateOf("") }
+    var color by remember { mutableStateOf(1) }
+    var showDialog by remember { mutableStateOf(false) }
+    var id by remember { mutableStateOf(99999) }
+    var indexes by remember { mutableStateOf(99999) }
+    DeleteConfirmationDialog(
+        showDialog = showDialog,
+        onConfirm = {
+            viewModel.deleteCategoryById(id)
+            Log.d("categoryScree", "CategoryItem: delete ${id}")
+            itemTexts.removeAt(indexes)
+            showDialog = false
+        },
+        onDismiss = {
+            showDialog = false
+        }
+    )
+
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .clickable(
+                enabled = true,
+                onClickLabel = null,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null // This removes the ripple effect
+            ) {
+                editState.forEach {
+                    editState[it.key] = false
+                }
+            }
     ) {
         itemsIndexed(itemTexts) { index, item ->
             val isEditing = editState[index] ?: false
             val isColorOptionsVisible = showColorOptions[index] ?: false
             val oldCategoryEntity = CategoryEntity(id = item.id, name = item.name, color = item.color)
-            val newCategoryEntity = CategoryEntity(id = item.id, name = item.name, color = item.color)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,7 +125,7 @@ fun CategoryItem(
                                 value = item.name,
                                 onValueChange = {
                                     itemTexts[index] = item.copy(name = it)
-                                    newCategoryEntity.name = it
+                                    name = it
                                 },
                                 label = { Text("Kategori") },
                                 modifier = Modifier.weight(1f),
@@ -111,8 +145,12 @@ fun CategoryItem(
                         Row {
                             IconButton(onClick = {
                                 editState[index] = !isEditing
-                                if (isEditing && oldCategoryEntity != newCategoryEntity) {
-                                    viewModel.updateCategory(newCategoryEntity)
+                                Log.d("categoryscreen", "CategoryItem:  ${oldCategoryEntity.name == name}, ${oldCategoryEntity.color == color}")
+                                if (isEditing ) {
+                                    if (oldCategoryEntity.name != name || oldCategoryEntity.color != color) {
+                                        viewModel.updateCategory(itemTexts[index])
+                                    }
+
                                 }
                             }) {
                                 Icon(
@@ -122,8 +160,9 @@ fun CategoryItem(
                             }
 
                             IconButton(onClick = {
-                                viewModel.deleteCategoryById(item.id)
-                                itemTexts.removeAt(index)
+                                id = item.id
+                                indexes = index
+                                showDialog = true
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Delete,
@@ -138,7 +177,7 @@ fun CategoryItem(
                             onColorSelected = {
                                 itemTexts[index] = item.copy(color = it.toArgb())
                                 showColorOptions[index] = false
-                                newCategoryEntity.color = it.toArgb()
+                                color = it.toArgb()
                             }
                         )
                     }
