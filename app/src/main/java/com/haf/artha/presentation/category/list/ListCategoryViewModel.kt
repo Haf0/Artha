@@ -35,7 +35,7 @@ class ListCategoryViewModel @Inject constructor(
             }
         }
     }
-    fun getAllCategories() {
+    private fun getAllCategories() {
         viewModelScope.launch {
             categoryRepository.getAllCategories().collect {
                 _categoryList.value = UiState.Success(it)

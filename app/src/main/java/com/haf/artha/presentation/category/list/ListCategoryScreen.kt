@@ -63,23 +63,23 @@ fun ListCategoryScreen(
             LoadingIndicator()
         }
         is UiState.Error -> {
-            // Log.d("homeScreen", "HomeScreen: loading")
+            Text("Terjadi Kesalahan")
         }
         is UiState.Success -> {
-
            Box(
-               Modifier.fillMaxSize().clickable(
-                   enabled = true,
-                   onClickLabel = null,
-                   interactionSource = remember { MutableInteractionSource() },
-                   indication = null // This removes the ripple effect
-               ) {
-                   keyboardController?.hide()
-               }
+               Modifier
+                   .fillMaxSize()
+                   .clickable(
+                       enabled = true,
+                       onClickLabel = null,
+                       interactionSource = remember { MutableInteractionSource() },
+                       indication = null
+                   ) {
+                       keyboardController?.hide()
+                   }
            ){
                 CategoryItem(
                     modifier.padding(bottom = 56.dp),
-
                     items = (categoryList as UiState.Success).data.sortedBy { it.name }
                 )
                 Button(
