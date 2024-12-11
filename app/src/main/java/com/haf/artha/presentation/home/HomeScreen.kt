@@ -130,7 +130,8 @@ fun HomeScreenContent(
                         intColor = transaction.categoryId,
                         title = transaction.name,
                         date = transaction.date.toFormattedDate(),
-                        amount = CurrencyUtils.formatAmount(transaction.amount)
+                        amount = CurrencyUtils.formatAmount(transaction.amount),
+                        transactionType = transaction.type
                     )
                 }
             }
