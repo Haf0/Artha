@@ -113,6 +113,11 @@ class TransactionRepository @Inject constructor(
         return transactionDao.getAllTransactions()
     }
 
+    // Fetch a transaction by ID
+    suspend fun getTransactionById(transactionId: Int): TransactionEntity {
+        return transactionDao.getTransactionById(transactionId)
+    }
+
     // Fetch transactions for a specific day
     fun getTransactionsByDay(timestamp: Long): Flow<List<TransactionEntity>> {
         val (startOfDay, endOfDay) = DateUtils.getStartAndEndOfSpecificDay(timestamp)
