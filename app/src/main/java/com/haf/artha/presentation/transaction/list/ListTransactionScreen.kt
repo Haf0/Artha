@@ -28,6 +28,7 @@ fun ListTransactionScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
+    /* TODO Filter transactions by date */
     ListTransactionContent()
 }
 
