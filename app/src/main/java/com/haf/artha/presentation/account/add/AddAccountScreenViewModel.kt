@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.haf.artha.data.local.AccountRepository
 import com.haf.artha.data.local.entity.AccountEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -13,7 +12,7 @@ import javax.inject.Inject
 class AddAccountScreenViewModel @Inject constructor(
     private val accountRepository: AccountRepository
 ) : ViewModel() {
-    var account = MutableStateFlow<AccountEntity>(AccountEntity(0, "", "", 0.0))
+
     fun addAccount(
         name: String,
         balance: Double
