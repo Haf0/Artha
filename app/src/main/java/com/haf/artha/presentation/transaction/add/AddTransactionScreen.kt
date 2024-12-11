@@ -284,34 +284,34 @@ fun AddTransactionContent(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Add Transaction")
+                Text("Tambah Transaksi")
             }
 
         } else {
             // Transfer Form
-            Text(text = "Transfer From:")
+            Text(text = "Transfer Dari Akun:")
             LazyRow {
                 items(accounts) { account ->
-                    if (account != selectedToWallet) {
-                        AccountItem(
-                            account = account,
-                            isSelected = selectedFromWallet == account,
-                            onClick = { selectedFromWallet = account }
-                        )
-                    }
+                    AccountItem(
+                        account = account,
+                        isSelected = selectedFromWallet == account,
+                        onClick = { selectedFromWallet = account }
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "Transfer To:")
+            Text(text = "Transfer Ke Akun:")
             LazyRow {
                 items(accounts) { account ->
-                    AccountItem(
-                        account = account,
-                        isSelected = selectedToWallet == account,
-                        onClick = { selectedToWallet = account }
-                    )
+                    if(account != selectedFromWallet){
+                        AccountItem(
+                            account = account,
+                            isSelected = selectedToWallet == account,
+                            onClick = { selectedToWallet = account }
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
