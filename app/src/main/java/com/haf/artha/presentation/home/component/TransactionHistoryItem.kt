@@ -1,6 +1,7 @@
 package com.haf.artha.presentation.home.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,15 +28,16 @@ import com.haf.artha.data.local.model.TransactionType
 @Composable
 fun TransactionHistoryItem(
     modifier: Modifier = Modifier,
-    intColor: Int,
     title: String,
     date: String,
     amount: String,
-    transactionType: TransactionType
+    transactionType: TransactionType,
+    onClickItem : () -> Unit
 ) {
     Card(
         modifier = modifier
             .padding(vertical = 4.dp)
+            .clickable { onClickItem() }
     ) {
         Row(
             modifier = modifier
