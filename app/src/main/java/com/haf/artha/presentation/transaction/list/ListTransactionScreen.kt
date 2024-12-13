@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.haf.artha.navigation.Screen
 import com.haf.artha.presentation.home.component.TransactionHistoryItem
 import com.haf.artha.utils.CurrencyUtils
 
@@ -29,13 +30,16 @@ fun ListTransactionScreen(
     navController: NavHostController
 ) {
     /* TODO Filter transactions by date */
-    ListTransactionContent()
+    ListTransactionContent(
+        navController = navController
+    )
 }
 
 @Composable
 fun ListTransactionContent(
     modifier: Modifier = Modifier,
-    viewModel: ListTransactionViewModel = hiltViewModel()
+    viewModel: ListTransactionViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val transactions by viewModel.transactions.collectAsState(emptyList())
 
@@ -55,11 +59,13 @@ fun ListTransactionContent(
             }
             items(transactions) { transaction ->
                 TransactionHistoryItem(
-                    intColor = transaction.categoryId,
                     title = transaction.name,
                     date = transaction.date.toFormattedDate(),
                     amount = CurrencyUtils.formatAmount(transaction.amount),
-                    transactionType = transaction.type
+                    transactionType = transaction.type,
+                    onClickItem = {
+                        navController.navigate(Screen.DetailTransaction.createRoute(transaction.transactionId))
+                    }
                 )
             }
         }
