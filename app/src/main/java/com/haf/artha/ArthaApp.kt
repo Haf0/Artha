@@ -32,6 +32,7 @@ import com.haf.artha.presentation.overview.OverviewScreen
 import com.haf.artha.presentation.setting.SettingScreen
 import com.haf.artha.presentation.splash.SplashScreen
 import com.haf.artha.presentation.transaction.add.AddTransactionScreen
+import com.haf.artha.presentation.transaction.detail.DetailTransactionScreen
 import com.haf.artha.presentation.transaction.list.ListTransactionScreen
 
 @Composable
@@ -118,6 +119,11 @@ fun ArthaApp(
 
             composable(Screen.Transaction.route){
                 ListTransactionScreen(navController = navController)
+            }
+
+            composable(Screen.DetailTransaction.route){ navBackStackEntry ->
+                val transactionId = navBackStackEntry.arguments?.getString("transactionId")?.toIntOrNull()
+                DetailTransactionScreen(navController = navController,transactionId = transactionId!!)
             }
 
             composable(Screen.AddAccount.route){ backStackEntry ->
