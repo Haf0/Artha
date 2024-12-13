@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
+import com.haf.artha.data.model.TransactionDetail
 import kotlinx.coroutines.flow.Flow
 
 
@@ -48,5 +49,31 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT 15")
     fun getRecentTransactions(): Flow<List<TransactionEntity>>
 
+    @Query("""
+        SELECT 
+            t.id,
+            t.name AS transaction_name,
+            t.date,
+            t.type,
+            t.note,
+            t.amount,
+            c.name AS category_name,
+            a.name AS send_from,
+            at.name AS send_to
+        FROM 
+            transactions t
+        JOIN 
+            categories c 
+            ON t.category_id = c.id
+        JOIN 
+            account a 
+            ON t.account_id = a.id
+        LEFT JOIN 
+            account at 
+            ON t.to_account_id = at.id
+        WHERE 
+            t.id = :id;
 
+    """)
+    suspend fun getTransactionDetailById(id: Int): TransactionDetail
 }

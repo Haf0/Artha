@@ -1,13 +1,12 @@
 package com.haf.artha.data.local
 import DateUtils
-import android.util.Log
 import com.haf.artha.data.local.db.dao.AccountDao
 import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
+import com.haf.artha.data.model.TransactionDetail
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class TransactionRepository @Inject constructor(
@@ -114,8 +113,8 @@ class TransactionRepository @Inject constructor(
     }
 
     // Fetch a transaction by ID
-    suspend fun getTransactionById(transactionId: Int): TransactionEntity {
-        return transactionDao.getTransactionById(transactionId)
+    suspend fun getTransactionById(transactionId: Int): TransactionDetail {
+        return transactionDao.getTransactionDetailById(transactionId)
     }
 
     // Fetch transactions for a specific day
@@ -156,6 +155,5 @@ class TransactionRepository @Inject constructor(
 
     fun getRecentTransactions(): Flow<List<TransactionEntity>> {
         return transactionDao.getRecentTransactions()
-            .onEach { Log.d("TransactionRepository", "getRecentTransactions: $it") }
     }
 }
