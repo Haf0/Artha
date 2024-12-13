@@ -61,7 +61,7 @@ fun HomeScreen(
                     navController.navigate(Screen.Transaction.route)
                 },
                 onNavigateToDetailTransaction = {
-                    //TODO detail transaction
+                    navController.navigate(Screen.DetailTransaction.createRoute(it))
                 },
                 totalBalance = CurrencyUtils.formatAmount((homeState as UiState.Success).data.totalBalance),
                 income = CurrencyUtils.formatAmount((homeState as UiState.Success).data.totalIncome),
@@ -127,11 +127,13 @@ fun HomeScreenContent(
                 }
                 items(transactions) { transaction ->
                     TransactionHistoryItem(
-                        intColor = transaction.categoryId,
                         title = transaction.name,
                         date = transaction.date.toFormattedDate(),
                         amount = CurrencyUtils.formatAmount(transaction.amount),
-                        transactionType = transaction.type
+                        transactionType = transaction.type,
+                        onClickItem = {
+                            onNavigateToDetailTransaction(transaction.transactionId)
+                        }
                     )
                 }
             }
