@@ -14,11 +14,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
+import com.haf.artha.data.model.TransactionDetail
+import com.haf.artha.utils.CurrencyUtils.formatAmount
 
 @Composable
 fun DetailTransactionScreen(
@@ -27,7 +29,7 @@ fun DetailTransactionScreen(
     navController: NavHostController,
     viewModel: DetailTransactionViewModel = hiltViewModel()
 ) {
-    var transaction: TransactionEntity by remember { mutableStateOf(TransactionEntity(0,0,0,"",0L,TransactionType.INCOME,0,"",0.0)) }
+    var transaction: TransactionDetail by remember { mutableStateOf(TransactionDetail(0, "", 0L, TransactionType.INCOME, "", 0.0, "", "", "")) }
     LaunchedEffect(transaction) {
         transaction = viewModel.getTransaction(transactionId)
     }
@@ -39,7 +41,7 @@ fun DetailTransactionScreen(
 @Composable
 fun DetailScreenContent(
     modifier: Modifier = Modifier,
-    transaction: TransactionEntity
+    transaction: TransactionDetail
 ) {
     Card(
         modifier = modifier
@@ -47,16 +49,19 @@ fun DetailScreenContent(
             .padding(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Transaction Details", style = MaterialTheme.typography.displayMedium)
-            Text(text = "ID: ${transaction.transactionId}")
-            Text(text = "Account ID: ${transaction.accountId}")
-            Text(text = "Category ID: ${transaction.categoryId}")
-            Text(text = "Name: ${transaction.name}")
+            Text(text = transaction.transactionName, style = MaterialTheme.typography.displaySmall, color = Color.Black)
+            Text(text = "Account: ${transaction.sendFrom}")
+            Text(text = "Category: ${transaction.categoryName}")
             Text(text = "Date: ${transaction.date.toFormattedDate()}")
-            Text(text = "Type: ${transaction.type}")
-            Text(text = "To Account ID: ${transaction.toAccountId ?: "N/A"}")
+            val type = when(transaction.type) {
+                TransactionType.INCOME -> "Pemasukan"
+                TransactionType.EXPENSE -> "Pengeluaran}"
+                else -> "Transfer"
+            }
+            Text(text = "Type: $type")
+            Text(text = "To Account ID: ${transaction.sendTo ?: "N/A"}")
             Text(text = "Note: ${transaction.note}")
-            Text(text = "Amount: ${transaction.amount}")
+            Text(text = "Amount: ${formatAmount(transaction.amount)}")
         }
     }
 }
