@@ -79,7 +79,13 @@ object DateUtils {
 
     fun Long.toFormattedDate(): String {
         val date = Date(this)
-        val format = SimpleDateFormat("EEEE, dd-MM-yyyy", Locale("id", "ID"))
+        val format = SimpleDateFormat("EEEE, dd MMM yyyy", Locale("id", "ID"))
+        return format.format(date)
+    }
+
+    fun Long.toFormattedFullDate(): String {
+        val date = Date(this)
+        val format = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID"))
         return format.format(date)
     }
 
