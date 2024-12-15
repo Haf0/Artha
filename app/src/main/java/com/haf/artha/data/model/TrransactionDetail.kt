@@ -8,10 +8,16 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class TransactionDetail(
     val id: Int,
-    @ColumnInfo(name = "transaction_name")
+    @ColumnInfo(name = "account_id")
+    val accountId: Int,
+    @ColumnInfo(name = "category_id")
+    val categoryId: Int,
+    @ColumnInfo(name = "name")
     val transactionName: String,
     val date: Long,
     val type: TransactionType,
+    @ColumnInfo(name = "to_account_id")
+    val toAccountId: Int?,
     val note: String?,
     val amount: Double,
     @ColumnInfo(name = "category_name")
