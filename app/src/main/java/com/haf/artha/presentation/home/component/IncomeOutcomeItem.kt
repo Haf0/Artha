@@ -59,9 +59,9 @@ fun InOutItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isIncome) {
-                Image(modifier = modifier.size(40.dp), imageVector = ImageVector.vectorResource(id = R.drawable.arrowupward), contentDescription = "Income")
+                Image(modifier = modifier.size(40.dp), imageVector = ImageVector.vectorResource(id = R.drawable.arrowdownward), contentDescription = "Income")
             } else {
-                Image(modifier = modifier.size(40.dp), imageVector = ImageVector.vectorResource(id = R.drawable.arrowdownward), contentDescription = "Outcome")
+                Image(modifier = modifier.size(40.dp), imageVector = ImageVector.vectorResource(id = R.drawable.arrowupward), contentDescription = "Outcome")
             }
             Column (
                 modifier = modifier.padding(8.dp)
