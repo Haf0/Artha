@@ -23,6 +23,9 @@ interface TransactionDao {
     @Delete
     suspend fun delete(transaction: TransactionEntity)
 
+    @Query("DELETE FROM transactions WHERE id = :transactionId")
+    suspend fun deleteById(transactionId: Int)
+
     @Query("SELECT * FROM transactions")
     fun getAllTransactions(): Flow<List<TransactionEntity>>
 
@@ -51,12 +54,7 @@ interface TransactionDao {
 
     @Query("""
         SELECT 
-            t.id,
-            t.name AS transaction_name,
-            t.date,
-            t.type,
-            t.note,
-            t.amount,
+            t.*,
             c.name AS category_name,
             a.name AS send_from,
             at.name AS send_to

@@ -77,8 +77,8 @@ class TransactionRepository @Inject constructor(
     }
 
     // Delete a transaction and update the account balance accordingly
-    suspend fun deleteTransaction(transaction: TransactionEntity) {
-        transactionDao.delete(transaction)
+    suspend fun deleteTransaction(transaction: TransactionDetail) {
+        transactionDao.deleteById(transaction.id)
 
         val account = accountDao.getAccountById(transaction.accountId)
         if (account != null) {
