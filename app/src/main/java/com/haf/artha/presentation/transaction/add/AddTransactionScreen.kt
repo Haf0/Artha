@@ -114,7 +114,7 @@ fun AddTransactionContent(
     Log.d("categories", "AddTransactionContent: $categories")
     var selectedCategory by remember { mutableStateOf(categories.first()) }
 
-    var isButtonEnabled by remember { mutableStateOf(true) }
+    var isButtonEnabled by remember { mutableStateOf(false) }
 
     var errorMessage by remember { mutableStateOf("") }
 
@@ -252,8 +252,8 @@ fun AddTransactionContent(
             Button(
                 onClick = {
                     Log.d("insertwalletid", "AddTransactionContent: $selectedWallet")
-                    if(isButtonEnabled){
-
+                    if(!isButtonEnabled){
+                        isButtonEnabled = true
                         if (selectedWallet.id != 0){
                             Log.d("insert", "AddTransactionContent: $transactionType")
                             when(transactionType){
@@ -278,11 +278,13 @@ fun AddTransactionContent(
                             }
                             onBack()
                         }else{
+                            isButtonEnabled = false
                             Toast.makeText(context, "Jangan lupa pilih akun", Toast.LENGTH_SHORT).show()
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isButtonEnabled
             ) {
                 Text("Tambah Transaksi")
             }
@@ -335,7 +337,8 @@ fun AddTransactionContent(
             // Transfer Button
             Button(
                 onClick = {
-                    if(isButtonEnabled){
+                    if(!isButtonEnabled){
+                        isButtonEnabled = true
                         if(selectedFromWallet.id != 0 || selectedToWallet.id != 0){
                             transferFunds(
                                 selectedFromWallet.id,
@@ -346,13 +349,15 @@ fun AddTransactionContent(
                             onBack()
                         }else{
                             Toast.makeText(context, "Jangan lupa pilih akun", Toast.LENGTH_SHORT).show()
+                            isButtonEnabled = false
                         }
 
                     }
 
 
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isButtonEnabled
             ) {
                 Text("Transfer")
             }
