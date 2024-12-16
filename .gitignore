@@ -16,4 +16,7 @@ local.properties
 /.idea/vcs.xml
 /.idea/deploymentTargetSelector.xml
 /.idea/inspectionProfiles
-/.idea
+/.idea/
+/.idea/gradle.xml
+/.idea/misc.xml
+/.idea/inspectionProfiles/profiles_Default.xml
