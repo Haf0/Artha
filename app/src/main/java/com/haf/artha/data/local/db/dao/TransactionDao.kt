@@ -74,4 +74,30 @@ interface TransactionDao {
 
     """)
     suspend fun getTransactionDetailById(id: Int): TransactionDetail
+
+    @Query("""
+        SELECT * FROM transactions
+    WHERE
+        (:searchText IS NULL OR name LIKE '%' || :searchText || '%' OR note LIKE '%' || :searchText || '%')
+        AND (:startDate IS NULL OR :endDate IS NULL OR date BETWEEN :startDate AND :endDate)
+        AND (:startDate IS NULL AND :endDate IS NOT NULL OR date <= :endDate)
+        AND (:transactionTypes IS NULL OR type IN (:transactionTypes))
+        AND (:categories IS NULL OR category_id IN (:categories))
+        AND (:minAmount IS NULL OR :maxAmount IS NULL OR amount BETWEEN :minAmount AND :maxAmount)
+        AND (:accountId IS NULL OR account_id = :accountId)
+    """)
+    fun filterTransactions(
+        searchText: String?,
+        startDate: Long?,
+        endDate: Long?,
+        transactionTypes: List<TransactionType>?,
+        categories: List<Int>?,
+        minAmount: Double?,
+        maxAmount: Double?,
+        accountId: Int?
+    ): Flow<List<TransactionEntity>>
+
+
+
+
 }

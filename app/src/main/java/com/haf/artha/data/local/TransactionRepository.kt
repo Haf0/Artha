@@ -1,10 +1,12 @@
 package com.haf.artha.data.local
 import DateUtils
+import android.util.Log
 import com.haf.artha.data.local.db.dao.AccountDao
 import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.TransactionType
 import com.haf.artha.data.model.TransactionDetail
+import com.haf.artha.data.model.TransactionFilterState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -156,4 +158,26 @@ class TransactionRepository @Inject constructor(
     fun getRecentTransactions(): Flow<List<TransactionEntity>> {
         return transactionDao.getRecentTransactions()
     }
+
+    fun filterTransactions(
+        transactionFilterState: TransactionFilterState
+    ): Flow<List<TransactionEntity>> {
+        val endDate = transactionFilterState.endDate ?: DateUtils.getTodayTimestamp()
+        val filteredTransaction = transactionDao.filterTransactions(
+            transactionFilterState.searchText,
+            transactionFilterState.startDate,
+            endDate,
+            transactionFilterState.transactionTypes,
+            transactionFilterState.categories,
+            transactionFilterState.minAmount,
+            transactionFilterState.maxAmount,
+            transactionFilterState.accountId
+        )
+        Log.d("listTransaction", "filterTransactions: $filteredTransaction")
+
+        return filteredTransaction
+
+    }
+
+
 }
