@@ -121,7 +121,7 @@ fun HomeScreenContent(
                             .fillMaxWidth()
                             .padding(top = 8.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xD7FFD8E4))
+                            .background(Color(0xFFB39DDB))
                             .padding(8.dp)
                     )
                 }

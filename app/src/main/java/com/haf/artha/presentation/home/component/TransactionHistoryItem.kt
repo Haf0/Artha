@@ -51,7 +51,7 @@ fun TransactionHistoryItem(
                     TransactionType.INCOME -> ImageVector.vectorResource(id = R.drawable.arrowdownward)
                     TransactionType.EXPENSE -> ImageVector.vectorResource(id = R.drawable.arrowupward)
                     else -> {
-                        ImageVector.vectorResource(id = R.drawable.transfer)
+                        ImageVector.vectorResource(id = R.drawable.transfericon)
                     }
                 },
                 contentDescription = "transactionType"

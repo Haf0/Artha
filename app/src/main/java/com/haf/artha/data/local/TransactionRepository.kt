@@ -1,6 +1,5 @@
 package com.haf.artha.data.local
 import DateUtils
-import android.util.Log
 import com.haf.artha.data.local.db.dao.AccountDao
 import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
@@ -173,7 +172,6 @@ class TransactionRepository @Inject constructor(
             transactionFilterState.maxAmount,
             transactionFilterState.accountId
         )
-        Log.d("listTransaction", "filterTransactions: $filteredTransaction")
 
         return filteredTransaction
 
