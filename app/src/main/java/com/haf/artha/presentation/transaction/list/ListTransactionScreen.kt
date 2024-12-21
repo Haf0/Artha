@@ -6,7 +6,6 @@ package com.haf.artha.presentation.transaction.list
 
 import DateUtils.toFormattedDate
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +18,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -35,6 +38,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,22 +46,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.haf.artha.R
-import com.haf.artha.data.local.model.TransactionType
 import com.haf.artha.navigation.Screen
 import com.haf.artha.presentation.category.list.component.positionAwareImePadding
 import com.haf.artha.presentation.home.component.TransactionHistoryItem
 import com.haf.artha.presentation.transaction.list.component.FilterAccountItem
-import com.haf.artha.presentation.transaction.list.component.FilterCategpryItem
+import com.haf.artha.presentation.transaction.list.component.FilterCategoryItem
+import com.haf.artha.presentation.transaction.list.component.FilterTransactionTypeItem
 import com.haf.artha.utils.CurrencyUtils
 
 @Composable
@@ -209,64 +217,130 @@ fun FilterModalContent(
 ) {
     var startDate by remember { mutableStateOf<Long?>(null) }
     var endDate by remember { mutableStateOf<Long?>(null) }
-    var transactionTypes by remember { mutableStateOf<List<TransactionType>?>(null) }
     var minAmount by remember { mutableStateOf<Double?>(null) }
     var maxAmount by remember { mutableStateOf<Double?>(null) }
     var accountId by remember { mutableStateOf<Int?>(null) }
-
-    val selectedCategories = mutableListOf<Int>()
+    var selectedTransactionTypes by remember { mutableStateOf(listOf<String>()) }
+    var selectedCategories by remember { mutableStateOf(listOf<Int>()) }
     val listAccount = viewModel.accounts.collectAsState()
-    val listCategories = viewModel.categories.collectAsState()
+    val listCategories = viewModel.categories.collectAsState().value.sortedBy { it.name }
     val listTransactionTypes = listOf(
-        Pair("Pemasukan", TransactionType.INCOME),
-        Pair("Pengeluaran", TransactionType.EXPENSE),
-        Pair("Transfer", TransactionType.TRANSFER)
+        "Pemasukan",
+        "Pengeluaran",
+        "Transfer"
     )
+
+    val filterState = viewModel.filterState.collectAsState().value
+
+    LaunchedEffect(filterState) {
+        startDate = filterState.startDate
+        endDate = filterState.endDate
+        minAmount = filterState.minAmount
+        maxAmount = filterState.maxAmount
+        accountId = filterState.accountId
+        selectedTransactionTypes = filterState.transactionTypes ?: emptyList()
+        selectedCategories = filterState.categories ?: emptyList()
+    }
+
+    Log.d("list", "FilterModalContent: $listCategories")
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState
     ) {
-        val keyboardController = LocalSoftwareKeyboardController.current
         Column(
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)
                 .positionAwareImePadding()
+                .verticalScroll(rememberScrollState())
         ) {
             val context = LocalContext.current
-            Text("Akun")
-            Spacer(modifier = Modifier.padding(4.dp))
+            Text("Akun", modifier = Modifier.padding(top = 16.dp))
+            Spacer(modifier = Modifier.padding(bottom = 4.dp, top = 8.dp, start = 4.dp, end = 4.dp))
             FlowRow {
                 listAccount.value.sortedBy { it.name }.forEach { account ->
                     FilterAccountItem(
                         name = account.name,
                         isSelected = accountId == account.id,
                         onClick = {
-                            accountId = account.id
-                            Toast.makeText(context, "${account.id}", Toast.LENGTH_SHORT).show()
+                            accountId = if (accountId != account.id) { account.id } else{ null }
                         }
                     )
                 }
             }
-            Text("Kategori")
-            Spacer(modifier = Modifier.padding(4.dp))
+            Text("Kategori", modifier = Modifier.padding(top = 8.dp))
+            Spacer(modifier = Modifier.padding(bottom = 4.dp, top = 8.dp, start = 4.dp, end = 4.dp))
             FlowRow {
-                repeat(listCategories.value.size) { index ->
-                    FilterCategpryItem(
-                        list = listCategories.value.sortedBy { it.name }.map { it }.toMutableList(),
-                        index = index,
+                listCategories.forEachIndexed { index, category ->
+                    FilterCategoryItem(
+                        modifier = Modifier.padding(4.dp),
+                        color = category.color,
+                        name = category.name,
+                        isSelected = listCategories[index].id in selectedCategories,
                         onClick = {
-                            if (selectedCategories.contains(listCategories.value[index].id)) {
-                                selectedCategories.remove(listCategories.value[index].id)
+                            if (selectedCategories.contains(category.id)) {
+                                selectedCategories -= category.id
                             } else {
-                                selectedCategories.add(listCategories.value[index].id)
+                                selectedCategories += category.id
+                            }
+
+                        }
+                    )
+                }
+            }
+
+            Text("Jenis Transaksi", modifier = Modifier.padding(top = 8.dp))
+            Spacer(modifier = Modifier.padding(bottom = 4.dp, top = 8.dp, start = 4.dp, end = 4.dp))
+            FlowRow {
+                listTransactionTypes.forEachIndexed { index, name ->
+                    FilterTransactionTypeItem(
+                        name = name,
+                        isSelected = listTransactionTypes[index] in selectedTransactionTypes,
+                        onClick = {
+                            selectedTransactionTypes = if (selectedTransactionTypes.contains(name)) {
+                                selectedTransactionTypes - name
+                            } else {
+                                selectedTransactionTypes + name
                             }
                         }
                     )
                 }
             }
 
+            Text("Jumlah Uang", modifier = Modifier.padding(top = 8.dp))
+            Spacer(modifier = Modifier.padding(bottom = 4.dp, top = 8.dp, start = 4.dp, end = 4.dp))
 
 
+            val keyboardController = LocalSoftwareKeyboardController.current
+            val focusRequester = remember { FocusRequester() }
+            OutlinedTextField(
+                value = minAmount?.let{ "%.0f".format(it) } ?: "",
+                onValueChange = {
+                    minAmount = it.toDoubleOrNull()
+                },
+                label = { Text("Jumlah Minimal") },
+                modifier = Modifier.padding(top = 4.dp),
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions {
+                  focusRequester.requestFocus()
+                }
+            )
+
+            OutlinedTextField(
+                value = maxAmount?.let{ "%.0f".format(it) } ?: "",
+                onValueChange = {
+                    maxAmount = it.toDoubleOrNull()
+                },
+                label = { Text("Jumlah Maksimal") },
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .focusRequester(focusRequester),
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions {
+                    keyboardController?.hide()
+                }
+            )
 
             Row(
                 modifier = Modifier
@@ -289,15 +363,25 @@ fun FilterModalContent(
                     onClick = {
                         if(selectedCategories.isNotEmpty()){
                             viewModel.updateCategories(selectedCategories)
+                        }else{
+                            viewModel.updateCategories(emptyList())
                         }
                         if(startDate != null && endDate != null){
                             viewModel.updateDateRange(startDate!!, endDate!!)
                         }
-                        if(transactionTypes != null){
-                            viewModel.updateTransactionTypes(transactionTypes!!)
+                        if(selectedTransactionTypes.isNotEmpty()){
+                            viewModel.updateTransactionTypes(selectedTransactionTypes)
+                        }else{
+                            viewModel.updateTransactionTypes(emptyList())
                         }
                         if(minAmount != null && maxAmount != null){
                             viewModel.updateAmountRange(minAmount!!, maxAmount!!)
+                        }else{
+                            if (minAmount == null){
+                                viewModel.updateAmountRange(0.0, maxAmount!!)
+                            }else{
+                                viewModel.updateAmountRange(minAmount!!, null)
+                            }
                         }
                         if(accountId != null){
                             viewModel.updateAccountId(accountId!!)
