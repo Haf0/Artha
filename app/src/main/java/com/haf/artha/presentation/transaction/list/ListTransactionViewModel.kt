@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
+@file:OptIn(ExperimentalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 
 package com.haf.artha.presentation.transaction.list
 
@@ -10,7 +10,6 @@ import com.haf.artha.data.local.CategoryRepository
 import com.haf.artha.data.local.TransactionRepository
 import com.haf.artha.data.local.entity.AccountEntity
 import com.haf.artha.data.local.entity.CategoryEntity
-import com.haf.artha.data.local.model.TransactionType
 import com.haf.artha.data.model.TransactionFilterState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,12 +29,12 @@ class ListTransactionViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository,
     private val accountRepository: AccountRepository
 ):ViewModel() {
-    val transactions = transactionRepository.getAllTransactions()
 
     private val _filterState = MutableStateFlow(TransactionFilterState())
-
+    val filterState: StateFlow<TransactionFilterState> = _filterState.asStateFlow()
     val filteredTransactions =
         _filterState.flatMapLatest { filterState->
+            Log.d(TAG, "$filterState ")
             transactionRepository.filterTransactions(
                 filterState
             )
@@ -47,7 +46,7 @@ class ListTransactionViewModel @Inject constructor(
     fun updateSearchQuery(query: String) {
         _filterState.value = _filterState.value.copy(searchText = query)
     }
-    fun updateAmountRange(minAmount: Double, maxAmount: Double) {
+    fun updateAmountRange(minAmount: Double?, maxAmount: Double?) {
         _filterState.value = _filterState.value.copy(minAmount = minAmount, maxAmount = maxAmount)
     }
 
@@ -55,7 +54,7 @@ class ListTransactionViewModel @Inject constructor(
         _filterState.value = _filterState.value.copy(startDate = startDate, endDate = endDate)
     }
 
-    fun updateTransactionTypes(transactionTypes: List<TransactionType>) {
+    fun updateTransactionTypes(transactionTypes: List<String>) {
         _filterState.value = _filterState.value.copy(transactionTypes = transactionTypes)
     }
 
