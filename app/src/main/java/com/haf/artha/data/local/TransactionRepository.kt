@@ -1,5 +1,7 @@
 package com.haf.artha.data.local
 import DateUtils
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.haf.artha.data.local.db.dao.AccountDao
 import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
@@ -162,20 +164,68 @@ class TransactionRepository @Inject constructor(
         transactionFilterState: TransactionFilterState
     ): Flow<List<TransactionEntity>> {
         val endDate = transactionFilterState.endDate ?: DateUtils.getTodayTimestamp()
-        val filteredTransaction = transactionDao.filterTransactions(
-            transactionFilterState.searchText,
-            transactionFilterState.startDate,
-            endDate,
-            transactionFilterState.transactionTypes,
-            transactionFilterState.categories,
-            transactionFilterState.minAmount,
-            transactionFilterState.maxAmount,
-            transactionFilterState.accountId
-        )
-
+        val newFilterState = transactionFilterState.copy(endDate = endDate)
+        val filteredTransaction = transactionDao.getFilterTransactions(buildFilterTransactionQuery(newFilterState))
         return filteredTransaction
 
     }
+
+
+    private fun buildFilterTransactionQuery(
+        transactionFilterState: TransactionFilterState
+    ): SupportSQLiteQuery{
+        val query = StringBuilder("SELECT * FROM transactions WHERE 1=1")
+        val args = mutableListOf<Any>()
+
+        if(!transactionFilterState.searchText.isNullOrBlank()){
+            query.append(" AND (name LIKE '%' || ? || '%' OR note LIKE '%' || ? || '%')")
+            args.add(transactionFilterState.searchText)
+            args.add(transactionFilterState.searchText)
+        }
+
+        if(transactionFilterState.startDate != null && transactionFilterState.endDate != null){
+            query.append(" AND date BETWEEN ? AND ?")
+            args.add(transactionFilterState.startDate)
+            args.add(transactionFilterState.endDate)
+        }else if(transactionFilterState.endDate != null){
+            query.append(" AND date <= ?")
+            args.add(transactionFilterState.endDate)
+        }
+
+        if(!transactionFilterState.transactionTypes.isNullOrEmpty()){
+            query.append(" AND type IN (${transactionFilterState.transactionTypes.joinToString(","){"?"}})")
+            args.addAll(transactionFilterState.transactionTypes)
+        }
+
+        if(!transactionFilterState.categories.isNullOrEmpty()){
+            query.append(" AND category_id IN (${transactionFilterState.categories.joinToString(","){"?"}})")
+            args.addAll(transactionFilterState.categories)
+        }
+
+        if(transactionFilterState.minAmount != null && transactionFilterState.maxAmount != null){
+            query.append(" AND amount BETWEEN ? AND ?")
+            args.add(transactionFilterState.minAmount)
+            args.add(transactionFilterState.maxAmount)
+        }else{
+            if(transactionFilterState.minAmount != null){
+                query.append(" AND amount >= ?")
+                args.add(transactionFilterState.minAmount)
+            }
+
+            if(transactionFilterState.maxAmount != null){
+                query.append(" AND amount <= ?")
+                args.add(transactionFilterState.maxAmount)
+            }
+        }
+
+        if(transactionFilterState.accountId != null){
+            query.append(" AND account_id = ?")
+            args.add(transactionFilterState.accountId)
+        }
+
+        return SimpleSQLiteQuery(query.toString(), args.toTypedArray())
+    }
+
 
 
 }
