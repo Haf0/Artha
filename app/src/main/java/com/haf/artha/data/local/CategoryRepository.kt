@@ -16,10 +16,6 @@ class CategoryRepository @Inject constructor(
         categoryDao.update(category)
     }
 
-    suspend fun deleteCategory(category: CategoryEntity) {
-        categoryDao.delete(category)
-    }
-
     fun getAllCategories(): Flow<List<CategoryEntity>> {
         return categoryDao.getAllCategories()
     }
