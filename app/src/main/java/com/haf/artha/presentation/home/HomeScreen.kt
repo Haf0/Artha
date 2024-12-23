@@ -66,7 +66,7 @@ fun HomeScreen(
                 totalBalance = CurrencyUtils.formatAmount((homeState as UiState.Success).data.totalBalance),
                 income = CurrencyUtils.formatAmount((homeState as UiState.Success).data.totalIncome),
                 outcome = CurrencyUtils.formatAmount((homeState as UiState.Success).data.totalExpense),
-                listHistoryTransaction = (homeState as UiState.Success).data.recentTransaction
+                listHistoryTransaction = (homeState as UiState.Success).data.recentTransaction.sortedByDescending { it.date  }
             )
         }
     }
@@ -112,7 +112,7 @@ fun HomeScreenContent(
         HorizontalDivider(color = PurpleGrey40, thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
 
         LazyColumn {
-            val groupedTransactions = listHistoryTransaction.sortedBy { it.date }.groupBy { it.date.toFormattedDate() }
+            val groupedTransactions = listHistoryTransaction.sortedByDescending { it.date }.groupBy { it.date.toFormattedDate() }
             groupedTransactions.forEach { (date, transactions) ->
                 stickyHeader {
                     Text(
@@ -125,7 +125,7 @@ fun HomeScreenContent(
                             .padding(8.dp)
                     )
                 }
-                items(transactions) { transaction ->
+                items(transactions.sortedByDescending { it.transactionId }) { transaction ->
                     TransactionHistoryItem(
                         title = transaction.name,
                         date = transaction.date.toFormattedDate(),
