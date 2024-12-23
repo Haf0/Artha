@@ -112,7 +112,7 @@ fun HomeScreenContent(
         HorizontalDivider(color = PurpleGrey40, thickness = 1.dp, modifier = Modifier.padding(bottom = 8.dp))
 
         LazyColumn {
-            val groupedTransactions = listHistoryTransaction.groupBy { it.date.toFormattedDate() }
+            val groupedTransactions = listHistoryTransaction.sortedBy { it.date }.groupBy { it.date.toFormattedDate() }
             groupedTransactions.forEach { (date, transactions) ->
                 stickyHeader {
                     Text(
