@@ -38,6 +38,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -102,28 +103,27 @@ fun AddTransactionContent(
     categories: List<CategoryEntity>,
     accounts: List<AccountEntity>,
     insertTransaction: (TransactionType, String, Int, Int, Long, String, Double) -> Unit,
-    transferFunds: (Int, Int, Double, Long) -> Unit,
+    transferFunds: (AccountEntity,AccountEntity, Double, Long) -> Unit,
     onBack: () -> Unit,
     context: Context
 ) {
-    var transactionType by remember { mutableStateOf("Income") }
-    var transactionTypeEnum by remember { mutableStateOf(TransactionType.INCOME) }
+    var transactionType by remember { mutableStateOf(TransactionType.INCOME) }
     var transactionName by remember { mutableStateOf("") }
     var selectedWallet by remember { mutableStateOf(accounts.firstOrNull() ?: AccountEntity(0, "Bank", "Bank", 100000.0)) }
     var transactionDate by remember { mutableLongStateOf(getTodayTimestamp()) }
     var transactionNote by remember { mutableStateOf("") }
     var transactionAmount by remember { mutableStateOf("") }
     var selectedFromWallet by remember { mutableStateOf(accounts.firstOrNull() ?: AccountEntity(0, "Bank", "Bank", 100000.0)) }
-    var selectedToWallet by remember { mutableStateOf(accounts.getOrNull(1) ?: AccountEntity(0, "E-wallet", "E-wallet", 100000.0)) }
+    var selectedToWallet by remember { mutableStateOf(accounts.getOrNull(1) ?: AccountEntity(-1, "E-wallet", "E-wallet", 100000.0)) }
     var selectedCategory by remember { mutableStateOf(categories.firstOrNull() ?: CategoryEntity(0, "Default", Color.Gray.toArgb())) }
     var isButtonEnabled by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var showDatePickerModal by remember { mutableStateOf(false) }
 
-    transactionTypeEnum = when (transactionType) {
-        "Pendapatan" -> TransactionType.INCOME
-        "Pengeluaran" -> TransactionType.EXPENSE
-        else -> TransactionType.TRANSFER
+    LaunchedEffect(selectedFromWallet) {
+        if (selectedToWallet == selectedFromWallet || selectedToWallet.id == -1) {
+            selectedToWallet = accounts.minus(selectedFromWallet).first()
+        }
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -137,16 +137,20 @@ fun AddTransactionContent(
             )
         }
 
+        val options = mutableMapOf(
+            "Pendapatan" to TransactionType.INCOME,
+            "Pengeluaran" to TransactionType.EXPENSE,
+            "Transfer" to TransactionType.TRANSFER
+        )
         TypeOptions(
-            options = listOf("Pendapatan", "Pengeluaran", "Transfer"),
-            onOptionSelected = { transactionType = it }
+            options = options,
+            onOptionSelected = { transactionType = options[it]!! }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (transactionType != "Transfer") {
+        if (transactionType != TransactionType.TRANSFER) {
             TransactionForm(
-                transactionType = transactionType,
                 transactionName = transactionName,
                 onTransactionNameChange = { transactionName = it },
                 accounts = accounts,
@@ -164,7 +168,7 @@ fun AddTransactionContent(
                 isButtonEnabled = isButtonEnabled,
                 onButtonClick = {
                     handleTransactionButtonClick(
-                        transactionType = transactionTypeEnum,
+                        transactionType = transactionType,
                         selectedWallet = selectedWallet,
                         selectedCategory = selectedCategory,
                         transactionDate = transactionDate,
@@ -177,7 +181,6 @@ fun AddTransactionContent(
                         isButtonEnabled = isButtonEnabled,
                         setIsButtonEnabled = { isButtonEnabled = it },
                     )
-                    Log.d("transaction", "AddTransactionContent: $transactionType $selectedWallet $selectedCategory $transactionDate $transactionName $transactionNote $transactionAmount $insertTransaction $onBack $context $isButtonEnabled")
                 }
             )
         } else {
@@ -202,7 +205,6 @@ fun AddTransactionContent(
                         isButtonEnabled = isButtonEnabled,
                         setIsButtonEnabled = { isButtonEnabled = it }
                     )
-                    Log.d("transaction", "AddTransactionContent: $selectedFromWallet $selectedToWallet $transactionAmount $transactionDate $transferFunds $onBack $isButtonEnabled ")
                 }
             )
         }
@@ -211,14 +213,14 @@ fun AddTransactionContent(
 
 @Composable
 fun TypeOptions(
-    options: List<String>,
+    options: Map<String,TransactionType>,
     onOptionSelected: (String) -> Unit,
 ) {
     var selectedIndex by remember { mutableStateOf(0) }
     SingleChoiceSegmentedButtonRow(
         modifier = Modifier.fillMaxWidth()
     ) {
-        options.forEachIndexed { index, label ->
+        options.keys.forEachIndexed { index, label ->
             SegmentedButton(
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                 onClick = {
@@ -235,7 +237,6 @@ fun TypeOptions(
 
 @Composable
 fun TransactionForm(
-    transactionType: String,
     transactionName: String,
     onTransactionNameChange: (String) -> Unit,
     accounts: List<AccountEntity>,
@@ -257,7 +258,8 @@ fun TransactionForm(
         value = transactionName,
         onValueChange = onTransactionNameChange,
         label = { Text("Transaction Name") },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        maxLines = 1
     )
 
     Spacer(modifier = Modifier.height(8.dp))
@@ -351,7 +353,7 @@ fun TransactionForm(
         onValueChange = onTransactionAmountChange,
         label = { Text("Jumlah") },
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions (
             onDone = {keyboardController?.hide()}
         )
@@ -380,6 +382,7 @@ fun TransferForm(
     isButtonEnabled: Boolean,
     onButtonClick: () -> Unit
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     Text(text = "Transfer dari Akun:")
     LazyRow {
         items(accounts) { account ->
@@ -414,6 +417,11 @@ fun TransferForm(
         label = { Text("Jumlah yang akan ditransfer") },
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        keyboardActions = KeyboardActions (
+            onDone = {
+                keyboardController?.hide()
+            }
+        )
     )
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -441,6 +449,16 @@ fun handleTransactionButtonClick(
     isButtonEnabled: Boolean,
     setIsButtonEnabled: (Boolean) -> Unit
 ) {
+    Log.d(TAG, "handleTransactionButtonClick: $transactionType, $selectedWallet, $selectedCategory, $transactionDate, $transactionName, $transactionNote, $transactionAmount")
+    if (transactionName.isEmpty()||transactionAmount.toDouble()==0.0 || transactionAmount.isEmpty()) {
+        setIsButtonEnabled(false)
+        Toast.makeText(context, "Nama dan Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
+        return
+    }else if (transactionAmount.toDouble() > selectedWallet.balance && transactionType == TransactionType.EXPENSE) {
+        setIsButtonEnabled(false)
+        Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
+        return
+    }
     if (!isButtonEnabled) {
         setIsButtonEnabled(true)
         if (selectedWallet.id != -1) {
@@ -487,7 +505,7 @@ fun handleTransferButtonClick(
     selectedToWallet: AccountEntity,
     transactionAmount: String,
     transactionDate: Long,
-    transferFunds: (Int, Int, Double, Long) -> Unit,
+    transferFunds: (AccountEntity,AccountEntity, Double, Long) -> Unit,
     onBack: () -> Unit,
     context: Context,
     isButtonEnabled: Boolean,
@@ -495,17 +513,25 @@ fun handleTransferButtonClick(
 ) {
     if (!isButtonEnabled) {
         setIsButtonEnabled(true)
-        if (selectedFromWallet.id != 0 && selectedToWallet.id != 0) {
-            transferFunds(
-                selectedFromWallet.id,
-                selectedToWallet.id,
-                transactionAmount.toDouble(),
-                transactionDate
-            )
-            onBack()
-        } else {
-            setIsButtonEnabled(false)
-            Toast.makeText(context, "Jangan Lupa Pilih Akun", Toast.LENGTH_SHORT).show()
+        Log.d(TAG, "handleTransferButtonClick: $selectedFromWallet, $selectedToWallet, $transactionAmount, $transactionDate")
+        when {
+            selectedFromWallet.id != -1 && selectedToWallet.id != -1 -> {
+                transferFunds(
+                    selectedFromWallet,
+                    selectedToWallet,
+                    transactionAmount.toDouble(),
+                    transactionDate
+                )
+                onBack()
+            }
+            transactionAmount.toDouble() > selectedFromWallet.balance -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Jangan Lupa Pilih Akun", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
