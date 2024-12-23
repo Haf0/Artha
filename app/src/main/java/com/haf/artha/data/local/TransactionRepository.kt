@@ -177,19 +177,20 @@ class TransactionRepository @Inject constructor(
         val query = StringBuilder("SELECT * FROM transactions WHERE 1=1")
         val args = mutableListOf<Any>()
 
+
         if(!transactionFilterState.searchText.isNullOrBlank()){
             query.append(" AND (name LIKE '%' || ? || '%' OR note LIKE '%' || ? || '%')")
             args.add(transactionFilterState.searchText)
             args.add(transactionFilterState.searchText)
         }
 
-        if(transactionFilterState.startDate != null && transactionFilterState.endDate != null){
-            query.append(" AND date BETWEEN ? AND ?")
-            args.add(transactionFilterState.startDate)
-            args.add(transactionFilterState.endDate)
-        }else if(transactionFilterState.endDate != null){
+        if (transactionFilterState.startDate != null) {
+            query.append(" AND date >= ?")
+            args.add(DateUtils.getStartOfDay(transactionFilterState.startDate))
+        }
+        if (transactionFilterState.endDate != null) {
             query.append(" AND date <= ?")
-            args.add(transactionFilterState.endDate)
+            args.add(DateUtils.getEndOfDay(transactionFilterState.endDate))
         }
 
         if(!transactionFilterState.transactionTypes.isNullOrEmpty()){
@@ -202,20 +203,13 @@ class TransactionRepository @Inject constructor(
             args.addAll(transactionFilterState.categories)
         }
 
-        if(transactionFilterState.minAmount != null && transactionFilterState.maxAmount != null){
-            query.append(" AND amount BETWEEN ? AND ?")
+        if (transactionFilterState.minAmount != null) {
+            query.append(" AND amount >= ?")
             args.add(transactionFilterState.minAmount)
+        }
+        if (transactionFilterState.maxAmount != null) {
+            query.append(" AND amount <= ?")
             args.add(transactionFilterState.maxAmount)
-        }else{
-            if(transactionFilterState.minAmount != null){
-                query.append(" AND amount >= ?")
-                args.add(transactionFilterState.minAmount)
-            }
-
-            if(transactionFilterState.maxAmount != null){
-                query.append(" AND amount <= ?")
-                args.add(transactionFilterState.maxAmount)
-            }
         }
 
         if(transactionFilterState.accountId != null){
