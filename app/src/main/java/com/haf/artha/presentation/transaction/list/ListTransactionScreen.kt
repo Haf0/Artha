@@ -139,6 +139,7 @@ fun ListTransactionContent(
         Column(
             modifier = modifier.padding(paddingValues)
         ) {
+            val keyboardController = LocalSoftwareKeyboardController.current
             Column(
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
             ) {
@@ -152,7 +153,11 @@ fun ListTransactionContent(
                         label = { Text("Cari Transaksi") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
+                            .padding(8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {keyboardController?.hide()}
+                        )
                     )
                 }
                 FilledTonalButton(

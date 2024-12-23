@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -77,7 +79,6 @@ fun InputUsername(
     navController: NavHostController,
     preferenceViewModel: PreferenceViewModel = hiltViewModel()
 ) {
-
     var username by remember { mutableStateOf("") }
     Column(
         modifier = modifier
@@ -85,6 +86,7 @@ fun InputUsername(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val keyboardController = LocalSoftwareKeyboardController.current
         OutlinedTextField(
             value = username,
             onValueChange = {newUsername ->
@@ -96,6 +98,9 @@ fun InputUsername(
                 .padding(top = 32.dp),
             singleLine = true ,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = { keyboardController?.hide()}
+            )
         )
 
         Button(

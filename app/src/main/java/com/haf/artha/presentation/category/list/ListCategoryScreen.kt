@@ -174,6 +174,7 @@ fun BottomSheetContent(
                     onValueChange = { name = it },
                     label = { Text("Kategori Baru") },
                     singleLine = true,
+                    maxLines = 1,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         keyboardController?.hide()

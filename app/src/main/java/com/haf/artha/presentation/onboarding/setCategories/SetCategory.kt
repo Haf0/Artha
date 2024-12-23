@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -84,6 +86,8 @@ fun SetCategory(
             .fillMaxSize()
             .padding(16.dp),
     ) {
+        val keyboardController = LocalSoftwareKeyboardController.current
+
         Column(
             modifier = modifier
                 .fillMaxWidth(),
@@ -135,10 +139,12 @@ fun SetCategory(
 
             var category by remember { mutableStateOf("") }
 
+
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 OutlinedTextField(
                     modifier = modifier
                         .weight(1f)
@@ -149,7 +155,12 @@ fun SetCategory(
                     },
                     label = { Text("Tambah Kategori") },
                     singleLine = true ,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                        }
+                    )
                 )
                 Button(
                     modifier = modifier.weight(0.15f),
