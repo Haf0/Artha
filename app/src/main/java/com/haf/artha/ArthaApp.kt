@@ -122,8 +122,8 @@ fun ArthaApp(
             }
 
             composable(Screen.DetailTransaction.route){ navBackStackEntry ->
-                val transactionId = navBackStackEntry.arguments?.getString("transactionId")?.toIntOrNull()
-                DetailTransactionScreen(navController = navController,transactionId = transactionId!!)
+                val transactionId = navBackStackEntry.arguments?.getString("transactionId")?.toInt() ?: -1
+                DetailTransactionScreen(navController = navController,transactionId = transactionId)
             }
 
             composable(Screen.AddAccount.route){ backStackEntry ->

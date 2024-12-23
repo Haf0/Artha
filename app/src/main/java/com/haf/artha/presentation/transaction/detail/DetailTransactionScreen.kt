@@ -53,18 +53,18 @@ fun DetailTransactionScreen(
         )
     ) }
     LaunchedEffect(transaction) {
-        transaction = viewModel.getTransaction(transactionId)
+        if (transaction.id != -1){
+            transaction = viewModel.getTransaction(transactionId)
+        }
     }
-    DetailScreenContent(transaction = transaction, navController = navController)
-
-    /* TODO make pretty*/
+    DetailScreenContent(transaction = transaction!!, navController = navController)
 
 }
 
 @Composable
 fun DetailScreenContent(
     modifier: Modifier = Modifier,
-    transaction: TransactionDetail,
+    transaction: TransactionDetail?,
     navController: NavHostController,
     viewModel: DetailTransactionViewModel = hiltViewModel()
 ) {
@@ -78,7 +78,7 @@ fun DetailScreenContent(
         DeleteConfirmationDialog(
             showDialog = showDeleteConfirmation,
             onConfirm = {
-                viewModel.deleteTransaction(transaction)
+                viewModel.deleteTransaction(transaction!!)
                 navController.popBackStack()
                 showDeleteConfirmation = false
             },
@@ -97,22 +97,25 @@ fun DetailScreenContent(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.Top
             ) {
-                Text(text = transaction.transactionName, style = MaterialTheme.typography.displaySmall, color = Color.Black)
-                Text(text = "Akun Pembayaran: ${transaction.sendFrom}")
-                Text(text = "Kategori: ${transaction.categoryName}")
-                Text(text = "Tanggal Transaksi: ${transaction.date.toFormattedFullDate()}")
-                val type = when(transaction.type) {
-                    TransactionType.INCOME -> "Pemasukan"
-                    TransactionType.EXPENSE -> "Pengeluaran}"
-                    else -> "Transfer"
-                }
-                Text(text = "Type: $type")
-                if(transaction.type == TransactionType.TRANSFER) {
-                    Text(text = "To Account ID: ${transaction.sendTo ?: "N/A"}")
+                transaction?.let {
+                    Text(text = it.transactionName, style = MaterialTheme.typography.displaySmall, color = Color.Black)
+                    Text(text = "Akun Pembayaran: ${it.sendFrom}")
+                    Text(text = "Kategori: ${it.categoryName}")
+                    Text(text = "Tanggal Transaksi: ${it.date.toFormattedFullDate()}")
+                    val type = when(it.type) {
+                        TransactionType.INCOME -> "Pemasukan"
+                        TransactionType.EXPENSE -> "Pengeluaran}"
+                        else -> "Transfer"
+                    }
+                    Text(text = "Type: $type")
+                    if(it.type == TransactionType.TRANSFER) {
+                        Text(text = "Di kirim dari akun ${it.sendFrom} ke akun ${it.sendTo ?: "N/A"}")
+                    }
+
+                    Text(text = "Note: ${it.note}")
+                    Text(text = "Amount: ${formatAmount(it.amount)}")
                 }
 
-                Text(text = "Note: ${transaction.note}")
-                Text(text = "Amount: ${formatAmount(transaction.amount)}")
             }
         }
 
