@@ -50,7 +50,7 @@ class ListTransactionViewModel @Inject constructor(
         _filterState.value = _filterState.value.copy(minAmount = minAmount, maxAmount = maxAmount)
     }
 
-    fun updateDateRange(startDate: Long, endDate: Long) {
+    fun updateDateRange(startDate: Long?, endDate: Long?) {
         _filterState.value = _filterState.value.copy(startDate = startDate, endDate = endDate)
     }
 
@@ -62,7 +62,7 @@ class ListTransactionViewModel @Inject constructor(
         _filterState.value = _filterState.value.copy(categories = categories)
     }
 
-    fun updateAccountId(accountId: Int) {
+    fun updateAccountId(accountId: Int?) {
         _filterState.value = _filterState.value.copy(accountId = accountId)
     }
 
