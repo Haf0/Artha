@@ -2,8 +2,8 @@
 
 package com.haf.artha.presentation.transaction.add
 
-import DateUtils.convertDateStringToLong
-import DateUtils.getTodayDate
+import DateUtils.getTodayTimestamp
+import DateUtils.toFormattedDate
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -31,6 +32,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -38,13 +40,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,9 +61,11 @@ import com.haf.artha.data.local.entity.CategoryEntity
 import com.haf.artha.data.local.model.TransactionType
 import com.haf.artha.presentation.common.UiState
 import com.haf.artha.presentation.component.LoadingIndicator
-import com.haf.artha.presentation.transaction.add.component.DateInputField
-import com.haf.artha.presentation.transaction.add.component.validateDate
+import com.haf.artha.presentation.transaction.list.component.DatePickerModal
 import com.haf.artha.utils.CurrencyUtils
+
+
+val TAG = "AddTransactionScreen"
 
 
 @Composable
@@ -64,314 +73,148 @@ fun AddTransactionScreen(
     navController: NavHostController,
     viewModel: AddTransactionViewModel = hiltViewModel()
 ) {
-    viewModel.uiState.collectAsState(UiState.Loading).value.let {
-        when(it) {
-            is UiState.Success -> {
-                val (categories, accounts) = it.data
-                AddTransactionContent(
-                    categories,
-                    accounts,
-                    viewModel::addTransaction,
-                    viewModel::transferFunds,
-                    onBack = {
-                        Thread.sleep(2000)
-                        navController.popBackStack()
-                    },
-                    LocalContext.current
-                )
-            }
-            is UiState.Error -> {
-                // Handle Error
-            }
-            is UiState.Loading -> {
-                LoadingIndicator()
-            }
+    val uiState by viewModel.uiState.collectAsState(UiState.Loading)
+    when (uiState) {
+        is UiState.Success -> {
+            val (categories, accounts) = (uiState as UiState.Success).data
+            AddTransactionContent(
+                categories,
+                accounts,
+                viewModel::addTransaction,
+                viewModel::transferFunds,
+                onBack = {
+                    navController.popBackStack()
+                },
+                LocalContext.current
+            )
+        }
+        is UiState.Error -> {
+            // Handle Error
+        }
+        is UiState.Loading -> {
+            LoadingIndicator()
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionContent(
     categories: List<CategoryEntity>,
-    accounts : List<AccountEntity>,
+    accounts: List<AccountEntity>,
     insertTransaction: (TransactionType, String, Int, Int, Long, String, Double) -> Unit,
     transferFunds: (Int, Int, Double, Long) -> Unit,
     onBack: () -> Unit,
     context: Context
 ) {
     var transactionType by remember { mutableStateOf("Income") }
+    var transactionTypeEnum by remember { mutableStateOf(TransactionType.INCOME) }
     var transactionName by remember { mutableStateOf("") }
-    var selectedWallet by remember { mutableStateOf(AccountEntity(0,"Bank","Bank", 100000.0)) }
-
-    var transactionDate by remember { mutableStateOf(getTodayDate()) }
-    var oldTransactionDate by remember { mutableStateOf(getTodayDate()) }
+    var selectedWallet by remember { mutableStateOf(accounts.firstOrNull() ?: AccountEntity(0, "Bank", "Bank", 100000.0)) }
+    var transactionDate by remember { mutableLongStateOf(getTodayTimestamp()) }
     var transactionNote by remember { mutableStateOf("") }
     var transactionAmount by remember { mutableStateOf("") }
-    var selectedFromWallet by remember { mutableStateOf(AccountEntity(0,"Bank","Bank", 100000.0)) }
-    var selectedToWallet by remember { mutableStateOf(AccountEntity(0,"E-wallet","E-wallet", 100000.0))}
-
-    Log.d("categories", "AddTransactionContent: $categories")
-    var selectedCategory by remember { mutableStateOf(categories.first()) }
-
+    var selectedFromWallet by remember { mutableStateOf(accounts.firstOrNull() ?: AccountEntity(0, "Bank", "Bank", 100000.0)) }
+    var selectedToWallet by remember { mutableStateOf(accounts.getOrNull(1) ?: AccountEntity(0, "E-wallet", "E-wallet", 100000.0)) }
+    var selectedCategory by remember { mutableStateOf(categories.firstOrNull() ?: CategoryEntity(0, "Default", Color.Gray.toArgb())) }
     var isButtonEnabled by remember { mutableStateOf(false) }
-
     var errorMessage by remember { mutableStateOf("") }
+    var showDatePickerModal by remember { mutableStateOf(false) }
 
-    Column (modifier = Modifier.padding(16.dp)) {
-        // Segmented Button
+    transactionTypeEnum = when (transactionType) {
+        "Pendapatan" -> TransactionType.INCOME
+        "Pengeluaran" -> TransactionType.EXPENSE
+        else -> TransactionType.TRANSFER
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        if (showDatePickerModal) {
+            DatePickerModal(
+                onDismiss = { showDatePickerModal = false },
+                onDateSelected = { date ->
+                    transactionDate = date ?: transactionDate
+                    showDatePickerModal = false
+                }
+            )
+        }
+
         TypeOptions(
-            options = listOf( "Income", "Outcome","Transfer"),
+            options = listOf("Pendapatan", "Pengeluaran", "Transfer"),
             onOptionSelected = { transactionType = it }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Income / Outcome Form
         if (transactionType != "Transfer") {
-            // Name Input
-            OutlinedTextField(
-                value = transactionName,
-                onValueChange = { transactionName = it },
-                label = { Text("Transaction Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Wallet Selection
-            Text(text = "Select Wallet:")
-            LazyRow {
-
-                items(accounts) { account ->
-                    AccountItem(
-                        account = account,
-                        isSelected = selectedWallet == account,
-                        onClick = { selectedWallet = account }
+            TransactionForm(
+                transactionType = transactionType,
+                transactionName = transactionName,
+                onTransactionNameChange = { transactionName = it },
+                accounts = accounts,
+                selectedWallet = selectedWallet,
+                onWalletSelected = { selectedWallet = it },
+                categories = categories,
+                selectedCategory = selectedCategory,
+                onCategorySelected = { selectedCategory = it },
+                transactionDate = transactionDate,
+                onDateClick = { showDatePickerModal = true },
+                transactionNote = transactionNote,
+                onTransactionNoteChange = { transactionNote = it },
+                transactionAmount = transactionAmount,
+                onTransactionAmountChange = { transactionAmount = it },
+                isButtonEnabled = isButtonEnabled,
+                onButtonClick = {
+                    handleTransactionButtonClick(
+                        transactionType = transactionTypeEnum,
+                        selectedWallet = selectedWallet,
+                        selectedCategory = selectedCategory,
+                        transactionDate = transactionDate,
+                        transactionName = transactionName,
+                        transactionNote = transactionNote,
+                        transactionAmount = transactionAmount,
+                        insertTransaction = insertTransaction,
+                        onBack = onBack,
+                        context = context,
+                        isButtonEnabled = isButtonEnabled,
+                        setIsButtonEnabled = { isButtonEnabled = it },
                     )
+                    Log.d("transaction", "AddTransactionContent: $transactionType $selectedWallet $selectedCategory $transactionDate $transactionName $transactionNote $transactionAmount $insertTransaction $onBack $context $isButtonEnabled")
                 }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Category Dropdown
-            var expanded by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                OutlinedTextField(
-                    value = selectedCategory.name,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Category") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                )
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.exposedDropdownSize()
-                ) {
-                    categories.forEach { category ->
-                        DropdownMenuItem(
-                            text = { Text(category.name) },
-                            onClick = {
-                                selectedCategory = category
-                                expanded = false
-                            }
-                        )
-                        HorizontalDivider()
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Date Input
-            DateInputField(
-                text= transactionDate,
-                onTextChange = {
-                        newText ->
-                    val cleanInput = newText.replace("/", "")
-
-                    // Handle backspace
-                    if (cleanInput.length < oldTransactionDate.replace("/", "").length) {
-                        oldTransactionDate = newText
-                        transactionDate = newText
-                        return@DateInputField
-                    }
-
-                    // Format the input if it's valid (<= 8 characters for ddMMyyyy)
-                    if (cleanInput.length <= 8) {
-                        transactionDate = newText
-                        oldTransactionDate = transactionDate
-                        errorMessage = validateDate(cleanInput)
-                    }
-                },
-                errorMessage = errorMessage
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Note Input
-            OutlinedTextField(
-                value = transactionNote,
-                onValueChange = {
-                    if (it.length <= 150) transactionNote = it
-                },
-                label = { Text("Note (Max 150 chars)") },
-                modifier = Modifier.fillMaxWidth(),
-                maxLines = 3
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Amount Input
-            OutlinedTextField(
-                value = transactionAmount,
-                onValueChange = {
-                    if (it.all { char -> char.isDigit() } && it != "0") {
-                        transactionAmount = it
-                    }
-                },
-                label = { Text("Amount") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Add Button
-            Button(
-                onClick = {
-                    Log.d("insertwalletid", "AddTransactionContent: $selectedWallet")
-                    if(!isButtonEnabled){
-                        isButtonEnabled = true
-                        if (selectedWallet.id != 0){
-                            Log.d("insert", "AddTransactionContent: $transactionType")
-                            when(transactionType){
-                                "Income" -> insertTransaction(
-                                    TransactionType.INCOME,
-                                    transactionName,
-                                    selectedWallet.id,
-                                    selectedCategory.id,
-                                    convertDateStringToLong(transactionDate),
-                                    transactionNote,
-                                    transactionAmount.toDouble()
-                                )
-                                "Outcome" -> insertTransaction(
-                                    TransactionType.EXPENSE,
-                                    transactionName,
-                                    selectedWallet.id,
-                                    selectedCategory.id,
-                                    convertDateStringToLong(transactionDate),
-                                    transactionNote,
-                                    transactionAmount.toDouble()
-                                )
-                            }
-                            onBack()
-                        }else{
-                            isButtonEnabled = false
-                            Toast.makeText(context, "Jangan lupa pilih akun", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isButtonEnabled
-            ) {
-                Text("Tambah Transaksi")
-            }
-
         } else {
-            // Transfer Form
-            Text(text = "Transfer Dari Akun:")
-            LazyRow {
-                items(accounts) { account ->
-                    AccountItem(
-                        account = account,
-                        isSelected = selectedFromWallet == account,
-                        onClick = { selectedFromWallet = account }
+            TransferForm(
+                accounts = accounts,
+                selectedFromWallet = selectedFromWallet,
+                onFromWalletSelected = { selectedFromWallet = it },
+                selectedToWallet = selectedToWallet,
+                onToWalletSelected = { selectedToWallet = it },
+                transactionAmount = transactionAmount,
+                onTransactionAmountChange = { transactionAmount = it },
+                isButtonEnabled = isButtonEnabled,
+                onButtonClick = {
+                    handleTransferButtonClick(
+                        selectedFromWallet = selectedFromWallet,
+                        selectedToWallet = selectedToWallet,
+                        transactionAmount = transactionAmount,
+                        transactionDate = transactionDate,
+                        transferFunds = transferFunds,
+                        onBack = onBack,
+                        context = context,
+                        isButtonEnabled = isButtonEnabled,
+                        setIsButtonEnabled = { isButtonEnabled = it }
                     )
+                    Log.d("transaction", "AddTransactionContent: $selectedFromWallet $selectedToWallet $transactionAmount $transactionDate $transferFunds $onBack $isButtonEnabled ")
                 }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = "Transfer Ke Akun:")
-            LazyRow {
-                items(accounts) { account ->
-                    if(account != selectedFromWallet){
-                        AccountItem(
-                            account = account,
-                            isSelected = selectedToWallet == account,
-                            onClick = { selectedToWallet = account }
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Amount Input for Transfer
-            OutlinedTextField(
-                value = transactionAmount,
-                onValueChange = {
-                    if (it.all { char -> char.isDigit() } && it != "0") {
-                        transactionAmount = it
-                    }
-                },
-                label = { Text("Transfer Amount") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
             )
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Transfer Button
-            Button(
-                onClick = {
-                    if(!isButtonEnabled){
-                        isButtonEnabled = true
-                        if(selectedFromWallet.id != 0 || selectedToWallet.id != 0){
-                            transferFunds(
-                                selectedFromWallet.id,
-                                selectedToWallet.id,
-                                transactionAmount.toDouble(),
-                                convertDateStringToLong(transactionDate)
-                            )
-                            onBack()
-                        }else{
-                            Toast.makeText(context, "Jangan lupa pilih akun", Toast.LENGTH_SHORT).show()
-                            isButtonEnabled = false
-                        }
-
-                    }
-
-
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isButtonEnabled
-            ) {
-                Text("Transfer")
-            }
         }
     }
 }
 
-// Helper function for Segmented Button
 @Composable
 fun TypeOptions(
     options: List<String>,
     onOptionSelected: (String) -> Unit,
 ) {
-    var selectedIndex by remember{ mutableStateOf(0) }
+    var selectedIndex by remember { mutableStateOf(0) }
     SingleChoiceSegmentedButtonRow(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -390,7 +233,283 @@ fun TypeOptions(
     }
 }
 
-// ChipItem Composable
+@Composable
+fun TransactionForm(
+    transactionType: String,
+    transactionName: String,
+    onTransactionNameChange: (String) -> Unit,
+    accounts: List<AccountEntity>,
+    selectedWallet: AccountEntity,
+    onWalletSelected: (AccountEntity) -> Unit,
+    categories: List<CategoryEntity>,
+    selectedCategory: CategoryEntity,
+    onCategorySelected: (CategoryEntity) -> Unit,
+    transactionDate: Long,
+    onDateClick: () -> Unit,
+    transactionNote: String,
+    onTransactionNoteChange: (String) -> Unit,
+    transactionAmount: String,
+    onTransactionAmountChange: (String) -> Unit,
+    isButtonEnabled: Boolean,
+    onButtonClick: () -> Unit
+) {
+    OutlinedTextField(
+        value = transactionName,
+        onValueChange = onTransactionNameChange,
+        label = { Text("Transaction Name") },
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(text = "Select Wallet:")
+    LazyRow {
+        items(accounts) { account ->
+            AccountItem(
+                account = account,
+                isSelected = selectedWallet == account,
+                onClick = { onWalletSelected(account) }
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = selectedCategory.name,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Category") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.exposedDropdownSize()
+        ) {
+            categories.forEach { category ->
+                DropdownMenuItem(
+                    text = { Text(category.name) },
+                    onClick = {
+                        onCategorySelected(category)
+                        expanded = false
+                    }
+                )
+                HorizontalDivider()
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    OutlinedTextField(
+        value = transactionDate.toFormattedDate(),
+        onValueChange = {},
+        label = { Text("Transaction Date") },
+        modifier = Modifier
+            .width(200.dp)
+            .padding(top = 4.dp)
+            .clickable { onDateClick() },
+        maxLines = 1,
+        enabled = false,
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledTextColor = Color.Black,
+            disabledLabelColor = Color.Black,
+            disabledBorderColor = Color.Gray,
+            disabledLeadingIconColor = Color.Gray,
+            disabledTrailingIconColor = Color.Gray,
+            disabledPlaceholderColor = Color.Gray
+        )
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    OutlinedTextField(
+        value = transactionNote,
+        onValueChange = onTransactionNoteChange,
+        label = { Text("Note (Max 150 chars)") },
+        modifier = Modifier.fillMaxWidth(),
+        maxLines = 3
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    OutlinedTextField(
+        value = transactionAmount,
+        onValueChange = onTransactionAmountChange,
+        label = { Text("Jumlah") },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions (
+            onDone = {keyboardController?.hide()}
+        )
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Button(
+        onClick = onButtonClick,
+        modifier = Modifier.fillMaxWidth(),
+        enabled = !isButtonEnabled
+    ) {
+        Text("Tambahkan Transaksi")
+    }
+}
+
+@Composable
+fun TransferForm(
+    accounts: List<AccountEntity>,
+    selectedFromWallet: AccountEntity,
+    onFromWalletSelected: (AccountEntity) -> Unit,
+    selectedToWallet: AccountEntity,
+    onToWalletSelected: (AccountEntity) -> Unit,
+    transactionAmount: String,
+    onTransactionAmountChange: (String) -> Unit,
+    isButtonEnabled: Boolean,
+    onButtonClick: () -> Unit
+) {
+    Text(text = "Transfer dari Akun:")
+    LazyRow {
+        items(accounts) { account ->
+            AccountItem(
+                account = account,
+                isSelected = selectedFromWallet == account,
+                onClick = { onFromWalletSelected(account) }
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(text = "Transfer ke Akun:")
+    LazyRow {
+        items(accounts) { account ->
+            if (account != selectedFromWallet) {
+                AccountItem(
+                    account = account,
+                    isSelected = selectedToWallet == account,
+                    onClick = { onToWalletSelected(account) }
+                )
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    OutlinedTextField(
+        value = transactionAmount,
+        onValueChange = onTransactionAmountChange,
+        label = { Text("Jumlah yang akan ditransfer") },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Button(
+        onClick = onButtonClick,
+        modifier = Modifier.fillMaxWidth(),
+        enabled = !isButtonEnabled
+    ) {
+        Text("Transfer")
+    }
+}
+
+fun handleTransactionButtonClick(
+    transactionType: TransactionType,
+    selectedWallet: AccountEntity,
+    selectedCategory: CategoryEntity,
+    transactionDate: Long,
+    transactionName: String,
+    transactionNote: String,
+    transactionAmount: String,
+    insertTransaction: (TransactionType, String, Int, Int, Long, String, Double) -> Unit,
+    onBack: () -> Unit,
+    context: Context,
+    isButtonEnabled: Boolean,
+    setIsButtonEnabled: (Boolean) -> Unit
+) {
+    if (!isButtonEnabled) {
+        setIsButtonEnabled(true)
+        if (selectedWallet.id != -1) {
+            when (transactionType) {
+                TransactionType.INCOME -> {
+                    insertTransaction(
+                        TransactionType.INCOME,
+                        transactionName,
+                        selectedWallet.id,
+                        selectedCategory.id,
+                        transactionDate,
+                        transactionNote,
+                        transactionAmount.toDouble()
+                    )
+                    Log.d(TAG, "handleTransactionButtonClick: ${TransactionType.INCOME}, $transactionName, ${selectedWallet.id}, ${selectedCategory.id}, $transactionDate, $transactionNote, ${transactionAmount.toDouble()}")
+                }
+                TransactionType.EXPENSE -> {
+                    insertTransaction(
+                        TransactionType.EXPENSE,
+                        transactionName,
+                        selectedWallet.id,
+                        selectedCategory.id,
+                        transactionDate,
+                        transactionNote,
+                        transactionAmount.toDouble()
+                    )
+                    Log.d(TAG, "handleTransactionButtonClick: ${TransactionType.EXPENSE}, $transactionName, ${selectedWallet.id}, ${selectedCategory.id}, $transactionDate, $transactionNote, ${transactionAmount.toDouble()}")
+
+                }
+                else->{
+
+                }
+            }
+            onBack()
+        } else {
+            setIsButtonEnabled(false)
+            Toast.makeText(context, "Jangan lupa pilih akun", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+
+fun handleTransferButtonClick(
+    selectedFromWallet: AccountEntity,
+    selectedToWallet: AccountEntity,
+    transactionAmount: String,
+    transactionDate: Long,
+    transferFunds: (Int, Int, Double, Long) -> Unit,
+    onBack: () -> Unit,
+    context: Context,
+    isButtonEnabled: Boolean,
+    setIsButtonEnabled: (Boolean) -> Unit
+) {
+    if (!isButtonEnabled) {
+        setIsButtonEnabled(true)
+        if (selectedFromWallet.id != 0 && selectedToWallet.id != 0) {
+            transferFunds(
+                selectedFromWallet.id,
+                selectedToWallet.id,
+                transactionAmount.toDouble(),
+                transactionDate
+            )
+            onBack()
+        } else {
+            setIsButtonEnabled(false)
+            Toast.makeText(context, "Jangan Lupa Pilih Akun", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+
 @Composable
 fun AccountItem(
     account: AccountEntity,
@@ -436,4 +555,3 @@ fun AccountItem(
         }
     }
 }
-
