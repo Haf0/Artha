@@ -44,7 +44,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, UiState.Loading)
 
-    fun getTotalBalance(){
+    private fun getTotalBalance(){
         viewModelScope.launch {
             accountRepository.getTotalBalance().collect {
                 _totalBalance.value = UiState.Success(it)

@@ -57,7 +57,7 @@ fun DetailTransactionScreen(
     }
     DetailScreenContent(transaction = transaction, navController = navController)
 
-    /* TODO Add edit and delete button and make pretty*/
+    /* TODO make pretty*/
 
 }
 
@@ -123,17 +123,6 @@ fun DetailScreenContent(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                modifier = modifier.fillMaxWidth(),
-                onClick = {
-                    //TODO: add edit transaction well it's weird to edit transaction Actually
-                    navController.popBackStack()
-                }
-            ) {
-                Text("Edit Transaksi")
-            }
-
-
             Button(
                 modifier = modifier.fillMaxWidth(),
                 onClick = {
