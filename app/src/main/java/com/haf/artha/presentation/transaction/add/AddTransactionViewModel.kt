@@ -55,24 +55,25 @@ class AddTransactionViewModel @Inject constructor(
 
 
     fun transferFunds(
-        fromAccountId: Int,
-        toAccountId: Int,
+        fromAccount: AccountEntity,
+        toAccount:AccountEntity,
         amount: Double,
         date: Long
     ) {
         viewModelScope.launch {
-            val transferCategory = categoryRepository.getCategoryByName("Transfer") // Assuming you have a method to get category by name
+            val transferCategory = categoryRepository.getCategoryByName("Transfer")
             val transferCategoryId = transferCategory?.id ?: 0
+            Log.d(TAG, "transferFunds: ${fromAccount.id} ${toAccount.id} $amount $date $transferCategoryId")
             transactionRepository.insertTransaction(
                 TransactionEntity(
                     0,
-                    fromAccountId,
+                    fromAccount.id,
                     transferCategoryId,
-                    "Transfer to Another Account",
+                    "Transfer ke ${toAccount.name}",
                     date,
                     TransactionType.TRANSFER,
-                    toAccountId,
-                    "Transfer to Another Account",
+                    toAccount.id,
+                    "Transfer dari ${fromAccount.name} ke ${toAccount.name}",
                     amount
                 )
             )
