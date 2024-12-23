@@ -61,7 +61,7 @@ import com.haf.artha.data.local.entity.CategoryEntity
 import com.haf.artha.data.local.model.TransactionType
 import com.haf.artha.presentation.common.UiState
 import com.haf.artha.presentation.component.LoadingIndicator
-import com.haf.artha.presentation.transaction.list.component.DatePickerModal
+import com.haf.artha.presentation.transaction.component.DatePickerModal
 import com.haf.artha.utils.CurrencyUtils
 
 
