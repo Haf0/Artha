@@ -92,7 +92,7 @@ fun CategoryItem(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        itemsIndexed(itemTexts) { index, item ->
+        itemsIndexed(itemTexts.filter { it.name != "Transfer" }) { index, item ->
             var nameText by remember { mutableStateOf(item.name) }
             val isEditing = editState == index
             val isColorOptionsVisible = showColorOptions[index] ?: false
