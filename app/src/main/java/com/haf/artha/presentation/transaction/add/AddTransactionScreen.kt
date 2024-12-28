@@ -458,6 +458,10 @@ fun handleTransactionButtonClick(
         setIsButtonEnabled(false)
         Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
         return
+    }else if (transactionAmount.isEmpty()||transactionAmount.toDouble()==0.0) {
+        setIsButtonEnabled(false)
+        Toast.makeText(context, "Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
+        return
     }
     if (!isButtonEnabled) {
         setIsButtonEnabled(true)
@@ -527,6 +531,14 @@ fun handleTransferButtonClick(
             transactionAmount.toDouble() > selectedFromWallet.balance -> {
                 setIsButtonEnabled(false)
                 Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
+            }
+            transactionAmount.isEmpty() -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
+            }
+            transactionAmount.toDouble() == 0.0 -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Jumlah tidak boleh 0", Toast.LENGTH_SHORT).show()
             }
             else -> {
                 setIsButtonEnabled(false)
