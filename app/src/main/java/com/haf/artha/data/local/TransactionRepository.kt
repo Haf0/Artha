@@ -5,6 +5,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.haf.artha.data.local.db.dao.AccountDao
 import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
+import com.haf.artha.data.local.model.CategoryAmount
 import com.haf.artha.data.local.model.TransactionType
 import com.haf.artha.data.model.TransactionDetail
 import com.haf.artha.data.model.TransactionFilterState
@@ -218,6 +219,11 @@ class TransactionRepository @Inject constructor(
         }
 
         return SimpleSQLiteQuery(query.toString(), args.toTypedArray())
+    }
+
+
+    fun getCategoryAmount(year: Int,month:Int): Flow<List<CategoryAmount>> {
+        return transactionDao.getCategoryAmount(year,month)
     }
 
 
