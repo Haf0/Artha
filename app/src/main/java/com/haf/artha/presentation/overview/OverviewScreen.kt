@@ -9,3 +9,16 @@ import androidx.navigation.NavHostController
 fun OverviewScreen(modifier: Modifier = Modifier, navController: NavHostController) {
     Text(text = "Overview Screen")
 }
+
+
+@Composable
+fun OverViewContent(modifier: Modifier = Modifier) {
+
+}
+
+@Composable
+fun PieChartContent(
+    modifier: Modifier = Modifier
+) {
+
+}
