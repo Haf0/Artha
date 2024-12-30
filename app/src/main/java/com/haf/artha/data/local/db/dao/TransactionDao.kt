@@ -11,6 +11,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.CategoryAmount
 import com.haf.artha.data.local.model.TransactionType
+import com.haf.artha.data.local.model.TypeAmount
 import com.haf.artha.data.model.TransactionDetail
 import kotlinx.coroutines.flow.Flow
 
@@ -100,5 +101,20 @@ interface TransactionDao {
             t.category_id, year, month
     """)
     fun getCategoryAmount(year:Int,month: Int): Flow<List<CategoryAmount>>
+
+    @Query("""
+        SELECT 
+            t.type as type,
+            strftime('%Y', datetime(t.date / 1000, 'unixepoch')) as year,
+            strftime('%m', datetime(t.date / 1000, 'unixepoch')) as month,
+            SUM(t.amount) as totalAmount 
+        FROM 
+            transactions t
+        WHERE 
+            year =  :year AND month = :month
+        GROUP BY 
+            t.type, year, month
+    """)
+    fun getTypeAmount(year:Int,month: Int): Flow<List<TypeAmount>>
 
 }
