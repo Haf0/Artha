@@ -89,7 +89,7 @@ object DateUtils {
         return format.format(date)
     }
 
-    fun getTodayDate(): String {
+    private fun getTodayDate(): String {
         val formatter = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
         return formatter.format(Date())
     }
@@ -124,6 +124,14 @@ object DateUtils {
             set(Calendar.MILLISECOND, 0)
         }
         return calendar.timeInMillis
+    }
+
+
+    fun getTodayMonthAndYear(): Pair<Int, Int> {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        return Pair(year, month)
     }
 
 }
