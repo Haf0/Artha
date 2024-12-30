@@ -7,6 +7,7 @@ import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.CategoryAmount
 import com.haf.artha.data.local.model.TransactionType
+import com.haf.artha.data.local.model.TypeAmount
 import com.haf.artha.data.model.TransactionDetail
 import com.haf.artha.data.model.TransactionFilterState
 import kotlinx.coroutines.flow.Flow
@@ -224,6 +225,10 @@ class TransactionRepository @Inject constructor(
 
     fun getCategoryAmount(year: Int,month:Int): Flow<List<CategoryAmount>> {
         return transactionDao.getCategoryAmount(year,month)
+    }
+
+    fun getTransactionTypeAmount(year: Int,month:Int): Flow<List<TypeAmount>> {
+        return transactionDao.getTypeAmount(year,month)
     }
 
 
