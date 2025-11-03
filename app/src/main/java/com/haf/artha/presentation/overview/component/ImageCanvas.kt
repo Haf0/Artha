@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.haf.artha.R
 
 @Composable
-fun randoma(modifier: Modifier = Modifier) {
+fun SharedImage(modifier: Modifier = Modifier, isProfit: Boolean) {
     val context = LocalContext.current
     Column {
-        val bitmap = createIncomeExpenseBitmap(context, "+20%", "-10%")
+        val bitmap = createIncomeExpenseBitmap(context,"November 2025", isProfit, "+20%", "-10%")
         Image(
             bitmap = bitmap.asImageBitmap(),
             contentDescription = "Income Expense Graph",
@@ -32,24 +32,50 @@ fun randoma(modifier: Modifier = Modifier) {
 
 fun createIncomeExpenseBitmap(
     context: Context,
+    date: String,
+    isProfit: Boolean,
     incomeValue: String,
     expenseValue: String
 ): Bitmap {
-    val imageBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.profit)
+    val drawableResId = if(isProfit) R.drawable.profit else R.drawable.loss
+
+    val imageBitmap = BitmapFactory.decodeResource(context.resources, drawableResId)
     val width = imageBitmap.width
     val height = imageBitmap.height
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(bitmap)
+    val density = context.resources.displayMetrics.density
+    val topMarginPx = 16.dp.value * density
 
     canvas.drawBitmap(imageBitmap, 0f, 0f, null) // Draw as background
 
+    //Header stuff
+    val headerPaint = android.graphics.Paint().apply {
+        color = android.graphics.Color.DKGRAY
+        textSize = 145f
+        isFakeBoldText = true
+        textAlign = android.graphics.Paint.Align.CENTER
+    }
+
+    val headerCenterX = width / 2f
+    val headerFontMetrics = headerPaint.fontMetrics
+    val headerTargetY = topMarginPx
+    val headerBaselineY = headerTargetY - headerFontMetrics.ascent
+
+    canvas.drawText(date, headerCenterX, headerBaselineY, headerPaint)
+
+    //Expense Income stuff
     val paint = android.graphics.Paint().apply {
         color = android.graphics.Color.BLACK
         textSize = 145f
         isFakeBoldText = true
     }
-    canvas.drawText("Income  : $incomeValue", width*0.6f, height*0.75f, paint)
-    canvas.drawText("Expense : $expenseValue", width*0.6f, height*0.82f, paint)
+
+    val yIncomeText = if(isProfit) height*0.75f else height*0.30f
+    val yExpenseText = if(isProfit) height*0.82f else height*0.37f
+
+    canvas.drawText("Income  : $incomeValue", width*0.6f, yIncomeText, paint)
+    canvas.drawText("Expense : $expenseValue", width*0.6f, yExpenseText, paint)
 
     return bitmap
 }
@@ -57,5 +83,12 @@ fun createIncomeExpenseBitmap(
 @Preview(showBackground = true)
 @Composable
 fun GraphPreview() {
-    randoma()
+    SharedImage(isProfit = true)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LossPreview() {
+    SharedImage(isProfit = false)
+    
 }

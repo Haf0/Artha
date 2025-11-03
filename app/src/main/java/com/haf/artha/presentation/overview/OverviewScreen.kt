@@ -18,8 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import com.haf.artha.presentation.overview.component.createIncomeExpenseBitmap
-import com.haf.artha.presentation.overview.component.shareBitmap
 import java.time.Month
 
 @SuppressLint("NewApi")
@@ -37,7 +35,7 @@ fun OverViewContent(modifier: Modifier = Modifier) {
     var months by remember { mutableIntStateOf(time.second) }
 
     val context = LocalContext.current
-    val bitmap = createIncomeExpenseBitmap(context, "+20%", "-10%")
+    //val bitmap = createIncomeExpenseBitmap(context,true, "+20%", "-10%")
 
     Column {
         Text(text = "$months $years")
@@ -75,7 +73,7 @@ fun OverViewContent(modifier: Modifier = Modifier) {
         val monthName = Month.of(months).name
         Button(
             onClick = {
-                shareBitmap(context = context, bitmap = bitmap, title= "$monthName $years")
+                //shareBitmap(context = context, bitmap = bitmap, title= "$monthName $years")
             }
         ) {
             Icon(
