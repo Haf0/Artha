@@ -134,4 +134,12 @@ object DateUtils {
         return Pair(year, month)
     }
 
+    fun getMonthName(month: Int): String {
+        val months = arrayOf(
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        )
+        return if (month in 0..11) months[month] else "Bulan tidak valid"
+    }
+
 }
