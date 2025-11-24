@@ -33,7 +33,7 @@ class PreferenceViewModel @Inject constructor(private val preferenceManager: Pre
 
     fun completeOnboarding() {
         setOnboardingCompleted()
-        setCurrentStep(0) // Reset step to 0 when onboarding is completed
+        setCurrentStep(0)
     }
 
 
