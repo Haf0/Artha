@@ -1,6 +1,5 @@
 package com.haf.artha.presentation.category.list.component
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,12 +26,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,49 +50,66 @@ import com.haf.artha.ui.theme.listColorOption
 @Composable
 fun CategoryItem(
     modifier: Modifier,
-    items: List<CategoryEntity>,
+    items: List<CategoryEntity>, // Keeping this signature, though we use VM data
     viewModel: ListCategoryViewModel = hiltViewModel()
 ) {
     val uiSuccess by viewModel.categoryList.collectAsState()
-    val list = (uiSuccess as? UiState.Success)?.data ?: emptyList()
-    var editState by remember { mutableIntStateOf(-1) }
-    val itemTexts = remember { mutableStateListOf(*list.filter { it.name != "Transfer" }.toTypedArray()) }
-    val showColorOptions = remember { mutableStateMapOf<Int, Boolean>() }
+    val allItems = (uiSuccess as? UiState.Success)?.data ?: emptyList()
+
+    // Filter the list once, before the UI loop
+    val displayItems = remember(allItems) {
+        allItems.filter { it.name != "Transfer" }
+    }
+
     val colorsOption = listColorOption
     val keyboardController = LocalSoftwareKeyboardController.current
-    var name by remember { mutableStateOf("") }
-    var color by remember { mutableIntStateOf(1) }
-    var showDialog by remember { mutableStateOf(false) }
-    var id by remember { mutableIntStateOf(99999) }
-    var indexes by remember { mutableIntStateOf(99999) }
 
-    LaunchedEffect(items) {
-        itemTexts.clear()
-        itemTexts.addAll(items)
-    }
+    // STATE MANAGEMENT
+    // We track the ID of the item being edited, not the index
+    var editingId by remember { mutableIntStateOf(-1) }
+
+    // Temporary state for the values being edited
+    var tempName by remember { mutableStateOf("") }
+    var tempColor by remember { mutableIntStateOf(0) }
+    var isColorPickerOpen by remember { mutableStateOf(false) }
+
+    // Dialog State
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var itemToDeleteId by remember { mutableIntStateOf(-1) }
+
     DeleteConfirmationDialog(
-        showDialog = showDialog,
+        showDialog = showDeleteDialog,
         onConfirm = {
-            viewModel.deleteCategoryById(id)
-            itemTexts.removeAt(indexes)
-            showDialog = false
+            viewModel.deleteCategoryById(itemToDeleteId)
+            showDeleteDialog = false
+            // If we deleted the item currently being edited, reset edit state
+            if (editingId == itemToDeleteId) {
+                editingId = -1
+            }
         },
         onDismiss = {
-            showDialog = false
+            showDeleteDialog = false
         }
     )
-
 
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        itemsIndexed(itemTexts.filter { it.name != "Transfer" }) { index, item ->
-            var nameText by remember { mutableStateOf(item.name) }
-            val isEditing = editState == index
-            val isColorOptionsVisible = showColorOptions[index] ?: false
-            val oldCategoryEntity = CategoryEntity(id = item.id, name = item.name, color = item.color)
+        // KEY FIX: Use 'items' with a 'key'. This ensures Compose tracks items by ID,
+        // preventing UI glitches when list order changes.
+        items(
+            items = displayItems,
+            key = { it.id }
+        ) { item ->
+
+            val isEditing = editingId == item.id
+
+            // Determine what to show: The temp state (if editing) or the actual item data
+            val displayName = if (isEditing) tempName else item.name
+            val displayColor = if (isEditing) tempColor else item.color
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,24 +123,24 @@ fun CategoryItem(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        // Color Circle
                         Box(
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .clip(CircleShape)
                                 .size(30.dp)
-                                .background(Color(item.color))
+                                .background(Color(displayColor))
                                 .border(1.dp, Color.Black, CircleShape)
                                 .clickable(enabled = isEditing) {
-                                    showColorOptions[index] = !isColorOptionsVisible
+                                    isColorPickerOpen = !isColorPickerOpen
                                 }
                         )
+
+                        // Name Field / Text
                         if (isEditing) {
                             OutlinedTextField(
-                                value = nameText,
-                                onValueChange = {
-                                    nameText = it
-                                    name = it
-                                },
+                                value = tempName,
+                                onValueChange = { tempName = it },
                                 label = { Text("Kategori") },
                                 modifier = Modifier.weight(1f),
                                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
@@ -138,23 +151,28 @@ fun CategoryItem(
                             )
                         } else {
                             Text(
-                                text = nameText,
+                                text = displayName,
                                 modifier = Modifier.weight(1f)
                             )
                         }
 
+                        // Action Buttons
                         Row {
                             IconButton(onClick = {
-                                if (isEditing ) {
-                                    if (oldCategoryEntity.name != name || oldCategoryEntity.color != color) {
-                                        viewModel.updateCategory(itemTexts[index].copy(name = nameText, color = color))
-                                        itemTexts[index] = item.copy(name = name, color = color)
+                                if (isEditing) {
+                                    // SAVE
+                                    if (item.name != tempName || item.color != tempColor) {
+                                        viewModel.updateCategory(item.copy(name = tempName, color = tempColor))
                                     }
-                                    editState = -1
-                                }else{
-                                    editState = index
-                                    name = item.name
-                                    color = item.color
+                                    editingId = -1
+                                    isColorPickerOpen = false
+                                } else {
+                                    // START EDIT
+                                    // If another item was being edited, close it first (optional)
+                                    editingId = item.id
+                                    tempName = item.name
+                                    tempColor = item.color
+                                    isColorPickerOpen = false
                                 }
                             }) {
                                 Icon(
@@ -165,12 +183,13 @@ fun CategoryItem(
 
                             IconButton(onClick = {
                                 if (isEditing) {
-                                    editState = -1
-                                    nameText = oldCategoryEntity.name
+                                    // CANCEL EDIT
+                                    editingId = -1
+                                    isColorPickerOpen = false
                                 } else {
-                                    id = item.id
-                                    indexes = index
-                                    showDialog = true
+                                    // DELETE
+                                    itemToDeleteId = item.id
+                                    showDeleteDialog = true
                                 }
                             }) {
                                 Icon(
@@ -180,21 +199,19 @@ fun CategoryItem(
                             }
                         }
                     }
-                    if(isColorOptionsVisible && isEditing){
+
+                    // Color Picker (Only show if this specific item is editing and picker is toggled)
+                    if (isEditing && isColorPickerOpen) {
                         ColorOptionsRow(
-                            colors =colorsOption,
+                            colors = colorsOption,
                             onColorSelected = {
-                                itemTexts[index] = item.copy(color = it.toArgb())
-                                showColorOptions[index] = false
-                                color = it.toArgb()
+                                tempColor = it.toArgb()
+                                isColorPickerOpen = false
                             }
                         )
                     }
                 }
             }
-
-
         }
     }
 }
-
