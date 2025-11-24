@@ -224,13 +224,21 @@ class TransactionRepository @Inject constructor(
 
 
     fun getCategoryAmount(year: Int,month:Int): Flow<List<CategoryAmount>> {
-        return transactionDao.getCategoryAmount("$year","$month")
+        val formattedMonth = month.toString().padStart(2, '0')
+        return transactionDao.getCategoryAmount("$year",formattedMonth)
     }
 
     fun getTransactionTypeAmount(year: Int,month:Int): Flow<List<TypeAmount>> {
         return transactionDao.getTypeAmount(year,month)
     }
 
-
+    fun getTotalIncomeByMonth(year: Int, month: Int): Flow<Double> {
+        val formattedMonth = month.toString().padStart(2, '0')
+        return transactionDao.getTotalIncomeByMonth("$year", formattedMonth).map { it ?: 0.0 }
+    }
+    fun getTotalExpenseByMonth(year: Int, month: Int): Flow<Double> {
+        val formattedMonth = month.toString().padStart(2, '0')
+        return transactionDao.getTotalExpenseByMonth("$year", formattedMonth).map { it ?: 0.0 }
+    }
 
 }

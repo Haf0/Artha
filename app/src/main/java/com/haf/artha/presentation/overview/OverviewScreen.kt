@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.haf.artha.presentation.overview.component.ExpenseIncomePieChart
 import com.haf.artha.presentation.overview.component.PieChart
 import com.haf.artha.presentation.overview.component.PieChartLegend
 import java.time.Month
@@ -61,11 +64,18 @@ fun OverViewContent(
     var months by remember { mutableIntStateOf(time.second+1) }
     val monthName = Month.of(months).name
     viewModel.getCategoriesAmount(years, months)
+    viewModel.getIncomeAmount(years, months)
+    viewModel.getExpenseAmount(years, months)
     val pieChartData by viewModel.categoryData.collectAsState()
+    val incomeAmount by viewModel.incomeData.collectAsState()
+    val expenseAmount by viewModel.expenseData.collectAsState()
+
     val context = LocalContext.current
     //val bitmap = createIncomeExpenseBitmap(context,true, "+20%", "-10%")
 
-    Column{
+    Column(
+        modifier.verticalScroll(rememberScrollState())
+    ){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -136,18 +146,30 @@ fun OverViewContent(
         Spacer(modifier = Modifier.height(16.dp))
         PieChartLegend(data = pieChartData)
 
-        Button(
-            modifier = Modifier.padding(top = 16.dp),
-            onClick = {
-                //shareBitmap(context = context, bitmap = bitmap, title= "$monthName $years")
-            }
+        ExpenseIncomePieChart(
+            expenseData = expenseAmount,
+            incomeData = incomeAmount,
+            modifier = Modifier
+                .padding(top = 16.dp)
+        )
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
         ) {
-            Icon(
-                Icons.Default.Share,
-                contentDescription = "Share",
-                modifier = Modifier.padding(end = 8.dp)
-            )
-            Text(text = "Bagikan")
+            Button(
+                modifier = Modifier.padding(top = 16.dp),
+                onClick = {
+                    //shareBitmap(context = context, bitmap = bitmap, title= "$monthName $years")
+                }
+            ) {
+                Icon(
+                    Icons.Default.Share,
+                    contentDescription = "Share",
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(text = "Bagikan")
+            }
         }
     }
 

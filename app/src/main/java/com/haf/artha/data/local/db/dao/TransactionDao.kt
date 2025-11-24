@@ -118,4 +118,25 @@ interface TransactionDao {
     """)
     fun getTypeAmount(year:Int,month: Int): Flow<List<TypeAmount>>
 
+
+
+    @Query("""
+        SELECT SUM(amount) 
+        FROM transactions 
+        WHERE type = :type 
+        AND strftime('%Y', datetime(date / 1000, 'unixepoch')) = :year 
+        AND strftime('%m', datetime(date / 1000, 'unixepoch')) = :month
+    """)
+    fun getTotalIncomeByMonth(year: String, month: String, type: TransactionType = TransactionType.INCOME): Flow<Double?>
+
+    @Query("""
+        SELECT SUM(amount) 
+        FROM transactions 
+        WHERE type = :type 
+        AND strftime('%Y', datetime(date / 1000, 'unixepoch')) = :year 
+        AND strftime('%m', datetime(date / 1000, 'unixepoch')) = :month
+    """)
+    fun getTotalExpenseByMonth(year: String, month: String, type: TransactionType = TransactionType.EXPENSE): Flow<Double?>
+
+
 }

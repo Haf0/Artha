@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,7 +30,7 @@ fun PieChart(
     modifier: Modifier = Modifier
 ) {
     if (data.isEmpty()) {
-        Text("No data")
+        Text("TIDAK ADA DATA")
         return
     }
 
@@ -72,7 +73,39 @@ fun PieChart(
         }
     }
 }
-
+@Composable
+fun ExpenseIncomePieChart(
+    expenseData: Double,
+    incomeData: Double,
+    modifier: Modifier = Modifier
+){
+    val data = if(expenseData!=0.0 || incomeData != 0.0) listOf(
+        CategoryAmount(
+            categoryId = 0,
+            categoryName = "Pengeluaran",
+            categoryColor = 0xFFE57373.toInt(),
+            year = "",
+            month = "",
+            totalAmount = expenseData
+        ),
+        CategoryAmount(
+            categoryId = 1,
+            categoryName = "Pendapatan",
+            categoryColor = 0xFF81C784.toInt(),
+            year = "",
+            month = "",
+            totalAmount = incomeData
+        )
+    ) else emptyList()
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        PieChart(data = data, modifier = modifier)
+    }
+    Spacer(modifier = Modifier.size(16.dp))
+    PieChartLegend(data)
+}
 @Composable
 fun PieChartLegend(data: List<CategoryAmount>, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
