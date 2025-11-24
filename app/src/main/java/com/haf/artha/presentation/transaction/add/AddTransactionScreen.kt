@@ -79,7 +79,7 @@ fun AddTransactionScreen(
         is UiState.Success -> {
             val (categories, accounts) = (uiState as UiState.Success).data
             AddTransactionContent(
-                categories,
+                categories.filter { it.name != "Transfer" },
                 accounts,
                 viewModel::addTransaction,
                 viewModel::transferFunds,

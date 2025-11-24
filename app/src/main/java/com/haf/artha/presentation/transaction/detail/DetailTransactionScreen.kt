@@ -98,13 +98,13 @@ fun DetailScreenContent(
                 verticalArrangement = Arrangement.Top
             ) {
                 transaction?.let {
-                    Text(text = it.transactionName, style = MaterialTheme.typography.displaySmall, color = Color.Black)
+                    Text(text = it.transactionName, modifier = modifier.padding(bottom = 8.dp), style = MaterialTheme.typography.displaySmall, color = Color.Black)
                     Text(text = "Akun Pembayaran: ${it.sendFrom}")
                     Text(text = "Kategori: ${it.categoryName}")
                     Text(text = "Tanggal Transaksi: ${it.date.toFormattedFullDate()}")
                     val type = when(it.type) {
                         TransactionType.INCOME -> "Pemasukan"
-                        TransactionType.EXPENSE -> "Pengeluaran}"
+                        TransactionType.EXPENSE -> "Pengeluaran"
                         else -> "Transfer"
                     }
                     Text(text = "Type: $type")
