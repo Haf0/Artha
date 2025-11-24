@@ -1,5 +1,6 @@
 package com.haf.artha.presentation.overview
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haf.artha.data.local.TransactionRepository
@@ -25,6 +26,7 @@ class OverviewViewModel @Inject constructor(
         viewModelScope.launch {
             transactionRepository.getCategoryAmount(year,month).collect {
                 _categoryData.value = it
+                Log.d("OVERVIEW", "getCategoriesAmount: $year $month $it" )
             }
         }
 

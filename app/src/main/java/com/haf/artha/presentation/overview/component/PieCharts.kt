@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,14 +18,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.haf.artha.data.local.model.CategoryAmount
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun PieChartContent(
-    data: List<CategoryAmountq>,
+fun PieChart(
+    data: List<CategoryAmount>,
     modifier: Modifier = Modifier
 ) {
     if (data.isEmpty()) {
@@ -34,22 +33,22 @@ fun PieChartContent(
         return
     }
 
-    val total = data.sumOf { it.amount }
+    val total = data.sumOf { it.totalAmount }
     var startAngle = 0f
 
     Canvas(modifier = modifier.size(200.dp)) {
         val radius = size.minDimension / 2
         val center = Offset(size.width / 2, size.height / 2)
         data.forEach { item ->
-            val sweep = (item.amount / total * 360f).toFloat()
+            val sweep = (item.totalAmount / total * 360f).toFloat()
             drawArc(
-                color = Color(item.color),
+                color = Color(item.categoryColor),
                 startAngle = startAngle,
                 sweepAngle = sweep,
                 useCenter = true,
                 size = Size(size.width, size.height)
             )
-            val percent = item.amount / total * 100
+            val percent = item.totalAmount / total * 100
             val angle = startAngle + sweep / 2
             val radian = Math.toRadians(angle.toDouble())
             val textRadius = radius * 0.7f
@@ -75,7 +74,7 @@ fun PieChartContent(
 }
 
 @Composable
-fun PieChartLegend(data: List<CategoryAmountq>, modifier: Modifier = Modifier) {
+fun PieChartLegend(data: List<CategoryAmount>, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         data.forEach { item ->
             Row(
@@ -85,39 +84,11 @@ fun PieChartLegend(data: List<CategoryAmountq>, modifier: Modifier = Modifier) {
                 Box(
                     modifier = Modifier
                         .size(16.dp)
-                        .background(Color(item.color))
+                        .background(Color(item.categoryColor))
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = item.categoryName)
             }
         }
-    }
-}
-
-data class CategoryAmountq(
-    val categoryName: String,
-    val amount: Double,
-    val color: Int
-)
-
-@Preview(showBackground = true)
-@Composable
-fun PieChartPreview() {
-    val sampleData = listOf(
-        CategoryAmountq("Food", 300.0, 0xFFE57373.toInt()),
-        CategoryAmountq("Transport", 150.0, 0xFF64B5F6.toInt()),
-        CategoryAmountq("Shopping", 200.0, 0xFF81C784.toInt()),
-        CategoryAmountq("Income", 500.0, 0xFFFFD54F.toInt()),
-        CategoryAmountq("Health", 120.0, 0xFFBA68C8.toInt()),
-        CategoryAmountq("Entertainment", 180.0, 0xFFFF8A65.toInt()),
-        CategoryAmountq("Utilities", 220.0, 0xFF4DD0E1.toInt()),
-        CategoryAmountq("Education", 90.0, 0xFFAED581.toInt()),
-        CategoryAmountq("Travel", 250.0, 0xFFDCE775.toInt()),
-        CategoryAmountq("Gifts", 200.0, 0xFFFFB74D.toInt())
-    )
-    Column {
-        PieChartContent(data = sampleData)
-        Spacer(modifier = Modifier.height(16.dp))
-        PieChartLegend(data = sampleData)
     }
 }
