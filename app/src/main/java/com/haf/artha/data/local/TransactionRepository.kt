@@ -224,7 +224,7 @@ class TransactionRepository @Inject constructor(
 
 
     fun getCategoryAmount(year: Int,month:Int): Flow<List<CategoryAmount>> {
-        return transactionDao.getCategoryAmount(year,month)
+        return transactionDao.getCategoryAmount("$year","$month")
     }
 
     fun getTransactionTypeAmount(year: Int,month:Int): Flow<List<TypeAmount>> {

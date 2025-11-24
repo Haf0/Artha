@@ -96,11 +96,12 @@ interface TransactionDao {
         JOIN 
             categories c ON t.category_id = c.id 
         WHERE 
-            year =  :year AND month = :month
+            strftime('%Y', datetime(t.date / 1000, 'unixepoch')) = :year
+            AND strftime('%m', datetime(t.date / 1000, 'unixepoch')) = :month
         GROUP BY 
             t.category_id, year, month
     """)
-    fun getCategoryAmount(year:Int,month: Int): Flow<List<CategoryAmount>>
+    fun getCategoryAmount(year: String, month: String): Flow<List<CategoryAmount>>
 
     @Query("""
         SELECT 
