@@ -1,6 +1,5 @@
 package com.haf.artha.presentation.overview
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haf.artha.data.local.TransactionRepository
@@ -22,7 +21,6 @@ class OverviewViewModel @Inject constructor(
         viewModelScope.launch {
             transactionRepository.getCategoryAmount(year,month).collect {
                 _categoryData.value = it
-                Log.d("OVERVIEW", "getCategoriesAmount: $year $month $it" )
             }
         }
 
@@ -30,21 +28,48 @@ class OverviewViewModel @Inject constructor(
 // TODO add the previous month data fetch function
     private val _incomeData = MutableStateFlow<Double>(0.0)
     val incomeData = _incomeData.asStateFlow()
+
+    private val _previousIncomeData = MutableStateFlow<Double>(0.0)
+    val previousIncomeData = _previousIncomeData.asStateFlow()
+
     fun getIncomeAmount(year: Int, month: Int) {
         viewModelScope.launch {
             transactionRepository.getTotalIncomeByMonth(year,month).collect {
                 _incomeData.value = it
             }
+        }
+    }
 
+    fun getPreviousIncomeAmount(year: Int, month: Int) {
+        viewModelScope.launch {
+            val previousMonth = if (month == 1) 12 else month - 1
+            val previousYear = if (month == 1) year - 1 else year
+            transactionRepository.getTotalIncomeByMonth(previousYear,previousMonth).collect {
+                _previousIncomeData.value = it
+            }
         }
     }
 
     private val _expenseData = MutableStateFlow<Double>(0.0)
     val expenseData = _expenseData.asStateFlow()
+
+    private val _previousExpenseData = MutableStateFlow<Double>(0.0)
+    val previousExpenseData = _previousExpenseData.asStateFlow()
+
     fun getExpenseAmount(year: Int, month: Int) {
         viewModelScope.launch {
             transactionRepository.getTotalExpenseByMonth(year,month).collect {
                 _expenseData.value = it
+            }
+        }
+    }
+
+    fun getPreviousExpenseAmount(year: Int, month: Int) {
+        viewModelScope.launch {
+            val previousMonth = if (month == 1) 12 else month - 1
+            val previousYear = if (month == 1) year - 1 else year
+            transactionRepository.getTotalExpenseByMonth(previousYear,previousMonth).collect {
+                _previousExpenseData.value = it
             }
         }
     }
