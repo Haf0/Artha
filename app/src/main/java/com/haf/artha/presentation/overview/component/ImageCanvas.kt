@@ -19,7 +19,7 @@ import com.haf.artha.R
 fun SharedImage(modifier: Modifier = Modifier, isProfit: Boolean) {
     val context = LocalContext.current
     Column {
-        val bitmap = createIncomeExpenseBitmap(context,"November 2025", isProfit, "+20%", "-10%")
+        val bitmap = createIncomeExpenseBitmap(context,"November 2025", isProfit, "+20%")
         Image(
             bitmap = bitmap.asImageBitmap(),
             contentDescription = "Income Expense Graph",
@@ -34,8 +34,7 @@ fun createIncomeExpenseBitmap(
     context: Context,
     date: String,
     isProfit: Boolean,
-    incomeValue: String,
-    expenseValue: String
+    nettProfit : String,
 ): Bitmap {
     val drawableResId = if(isProfit) R.drawable.profit else R.drawable.loss
 
@@ -67,15 +66,16 @@ fun createIncomeExpenseBitmap(
     //Expense Income stuff
     val paint = android.graphics.Paint().apply {
         color = android.graphics.Color.BLACK
-        textSize = 145f
+        textSize = 120f
         isFakeBoldText = true
     }
 
-    val yIncomeText = if(isProfit) height*0.75f else height*0.30f
-    val yExpenseText = if(isProfit) height*0.82f else height*0.37f
+    val yNettLabelText = if(isProfit) height*0.75f else height*0.30f
+    val yNettPercentageText = if(isProfit) height*0.82f else height*0.37f
 
-    canvas.drawText("Income  : $incomeValue", width*0.6f, yIncomeText, paint)
-    canvas.drawText("Expense : $expenseValue", width*0.6f, yExpenseText, paint)
+    val nettLabel = if(isProfit) "Pendapatan Bersih:" else "Kerugian Bersih:"
+    canvas.drawText(nettLabel, width*0.6f, yNettLabelText, paint)
+    canvas.drawText(nettProfit, width*0.6f, yNettPercentageText, paint)
 
     return bitmap
 }
