@@ -38,13 +38,16 @@ import androidx.navigation.NavHostController
 import com.haf.artha.presentation.overview.component.ExpenseIncomePieChart
 import com.haf.artha.presentation.overview.component.PieChart
 import com.haf.artha.presentation.overview.component.PieChartLegend
+import com.haf.artha.presentation.overview.component.createIncomeExpenseBitmap
+import com.haf.artha.presentation.overview.component.shareBitmap
 import java.time.Month
 
 @SuppressLint("NewApi")
 @Composable
 fun OverviewScreen(modifier: Modifier = Modifier, navController: NavHostController) {
     Column(
-        modifier .fillMaxSize()
+        modifier
+            .fillMaxSize()
             .padding(16.dp)
     ) {
         OverViewContent()
@@ -66,13 +69,23 @@ fun OverViewContent(
     viewModel.getCategoriesAmount(years, months)
     viewModel.getIncomeAmount(years, months)
     viewModel.getExpenseAmount(years, months)
+    viewModel.getPreviousIncomeAmount(years, months)
+    viewModel.getPreviousExpenseAmount(years, months)
     val pieChartData by viewModel.categoryData.collectAsState()
     val incomeAmount by viewModel.incomeData.collectAsState()
     val expenseAmount by viewModel.expenseData.collectAsState()
+    val previousMonthIncome by viewModel.previousIncomeData.collectAsState()
+    val previousMonthExpense by viewModel.previousExpenseData.collectAsState()
+    val thisMonthChange = compareNettResult(incomeAmount, expenseAmount)
+    val previousMonthChange = compareNettResult(previousMonthIncome, previousMonthExpense)
+    val monthOverMonthChange = monthOverMonthChange(thisMonthChange, previousMonthChange)
 
+    val comment = getCommentOnUserExpense(incomeAmount, expenseAmount, previousMonthIncome, previousMonthExpense)
+
+    val formattedMonthOverMonthChange = String.format("%.2f", monthOverMonthChange)
+    val isProfit = if (monthOverMonthChange >= 0) true else false
     val context = LocalContext.current
-    //val bitmap = createIncomeExpenseBitmap(context,true, "+20%", "-10%")
-
+    val bitmap = createIncomeExpenseBitmap(context,"$monthName $years" ,isProfit ,"$formattedMonthOverMonthChange%")
     Column(
         modifier.verticalScroll(rememberScrollState())
     ){
@@ -152,15 +165,23 @@ fun OverViewContent(
             modifier = Modifier
                 .padding(top = 16.dp)
         )
-
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = comment,
+            style = TextStyle(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold
+            ),
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         Box(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             contentAlignment = Alignment.Center
         ) {
             Button(
-                modifier = Modifier.padding(top = 16.dp),
                 onClick = {
-                    //shareBitmap(context = context, bitmap = bitmap, title= "$monthName $years")
+                    shareBitmap(context = context, bitmap = bitmap, title= "$monthName $years")
                 }
             ) {
                 Icon(
@@ -173,4 +194,47 @@ fun OverViewContent(
         }
     }
 
+}
+
+fun compareNettResult(income: Double, expense: Double): Double{
+    return income - expense
+}
+
+fun monthOverMonthChange(currentMonthValue: Double, previousMonthValue: Double): Double {
+    return if (previousMonthValue == 0.0) {
+        100.0
+    } else {
+        ((currentMonthValue - previousMonthValue) / previousMonthValue) * 100
+    }
+}
+
+fun getCommentOnUserExpense(
+    currentIncome: Double,
+    currentExpense: Double,
+    previousIncome: Double,
+    previousExpense: Double
+): String {
+    val currentNet = currentIncome - currentExpense
+    val previousNet = previousIncome - previousExpense
+    val netDiff = currentNet - previousNet
+    val expenseDiff = currentExpense - previousExpense
+
+    fun fmt(value: Double) = String.format("%,.0f", Math.abs(value))
+
+    return when {
+        currentNet > previousNet && currentExpense < previousExpense ->
+            "Gokil! Net income naik ${fmt(netDiff)}, pengeluaran kamu turun ${fmt(expenseDiff)} dibanding bulan lalu."
+        currentNet > previousNet ->
+            "Mantap! Net income kamu naik ${fmt(netDiff)} dibanding bulan lalu."
+        currentNet < previousNet && currentExpense > previousExpense ->
+            "Waduh! Pengeluaran naik ${fmt(expenseDiff)}, net income malah turun ${fmt(netDiff)} nih."
+        currentExpense > currentIncome ->
+            "Awas! Pengeluaran kamu bulan ini lebih gede ${fmt(currentExpense - currentIncome)} dari pemasukan."
+        currentExpense > previousExpense ->
+            "Cek lagi deh, pengeluaran Kamu naik ${fmt(expenseDiff)} dibanding bulan lalu."
+        currentIncome == 0.0 && currentExpense == 0.0 ->
+            "Wah, kamu gak punya catatan keuangan di bulan ini."
+        else ->
+            "Santuy, arus keuangan kamu masih stabil."
+    }
 }
