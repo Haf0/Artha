@@ -30,6 +30,7 @@ import com.haf.artha.presentation.onboarding.setCategories.SetCategory
 import com.haf.artha.presentation.onboarding.setUsername.SetUsername
 import com.haf.artha.presentation.overview.OverviewScreen
 import com.haf.artha.presentation.setting.SettingScreen
+import com.haf.artha.presentation.setting.about.AboutScreen
 import com.haf.artha.presentation.splash.SplashScreen
 import com.haf.artha.presentation.transaction.add.AddTransactionScreen
 import com.haf.artha.presentation.transaction.detail.DetailTransactionScreen
@@ -133,6 +134,11 @@ fun ArthaApp(
 
             composable(Screen.Category.route){
                 ListCategoryScreen()
+            }
+            composable(Screen.About.route) {
+                AboutScreen(
+                    onNavigateUp = { navController.popBackStack() }
+                )
             }
         }
     }
