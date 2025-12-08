@@ -25,22 +25,16 @@ fun SettingScreen(
             .padding(16.dp)
     ) {
         SettingItem(
-            title = "Profile"
-        )
-        SettingItem(
-            title = "Category",
+            title = "List Kategori",
             onClick = {
                 navController.navigate(Screen.Category.route)
             }
         )
         SettingItem(
-            title = "Account"
-        )
-        SettingItem(
-            title = "Transaction"
-        )
-        SettingItem(
-            title = "Overview"
+            title = "Tentang Aplikasi",
+            onClick = {
+                navController.navigate(Screen.About.route)
+            }
         )
     }
 }
@@ -52,7 +46,6 @@ fun SettingItem(
     title: String,
     onClick: () -> Unit = {}
 ) {
-    //item that can be clicked to navigate to a new screen
     Column(
         Modifier.fillMaxWidth().padding(vertical = 8.dp)
             .clickable {
