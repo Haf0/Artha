@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.haf.artha.R
+import com.haf.artha.BuildConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,8 +66,6 @@ fun AboutScreen(
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
-            // App Icon (Replace R.drawable.ic_launcher_foreground with your actual app icon if available)
-            // If you don't have a specific drawable resource yet, use a system icon
             Image(
                 painter = painterResource(id = R.mipmap.ic_launcher_foreground),
                 contentDescription = "App Logo",
@@ -75,16 +74,15 @@ fun AboutScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // App Name
             Text(
                 text = "Artha",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
 
-            // Version
+            val appVersion = BuildConfig.VERSION_NAME
             Text(
-                text = "Version 1.0.0",
+                text = appVersion,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -92,7 +90,7 @@ fun AboutScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             AboutListItem(
-                icon = Icons.Default.Info, // You could use a GitHub icon drawable here
+                icon = Icons.Default.Info,
                 title = "Source Code",
                 subtitle = "Lihat di GitHub",
                 onClick = {
