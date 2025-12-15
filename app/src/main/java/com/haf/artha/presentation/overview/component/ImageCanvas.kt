@@ -50,7 +50,7 @@ fun createIncomeExpenseBitmap(
 
     //Header stuff
     val headerPaint = android.graphics.Paint().apply {
-        color = android.graphics.Color.DKGRAY
+        color = android.graphics.Color.BLACK
         textSize = 145f
         isFakeBoldText = true
         textAlign = android.graphics.Paint.Align.CENTER
@@ -66,7 +66,7 @@ fun createIncomeExpenseBitmap(
     //Expense Income stuff
     val paint = android.graphics.Paint().apply {
         color = android.graphics.Color.BLACK
-        textSize = 120f
+        textSize = 60f
         isFakeBoldText = true
     }
 
