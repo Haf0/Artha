@@ -63,7 +63,7 @@ fun createIncomeExpenseBitmap(
 
     canvas.drawText(date, headerCenterX, headerBaselineY, headerPaint)
 
-    //Expense Income stuff
+    // Nett Profit/Loss stuff
     val paint = android.graphics.Paint().apply {
         color = android.graphics.Color.BLACK
         textSize = 60f
