@@ -88,16 +88,16 @@ interface TransactionDao {
             c.id as categoryId,
             c.name as categoryName,
             c.color as categoryColor,
-            strftime('%Y', datetime(t.date / 1000, 'unixepoch')) as year,
-            strftime('%m', datetime(t.date / 1000, 'unixepoch')) as month,
+            strftime('%Y', datetime(t.date / 1000, 'unixepoch', 'localtime')) as year,
+            strftime('%m', datetime(t.date / 1000, 'unixepoch', 'localtime')) as month,
             SUM(t.amount) as totalAmount 
         FROM 
             transactions t
         JOIN 
             categories c ON t.category_id = c.id 
         WHERE 
-            strftime('%Y', datetime(t.date / 1000, 'unixepoch')) = :year
-            AND strftime('%m', datetime(t.date / 1000, 'unixepoch')) = :month
+            strftime('%Y', datetime(t.date / 1000, 'unixepoch', 'localtime')) = :year
+            AND strftime('%m', datetime(t.date / 1000, 'unixepoch', 'localtime')) = :month
         GROUP BY 
             t.category_id, year, month
     """)
@@ -106,8 +106,8 @@ interface TransactionDao {
     @Query("""
         SELECT 
             t.type as type,
-            strftime('%Y', datetime(t.date / 1000, 'unixepoch')) as year,
-            strftime('%m', datetime(t.date / 1000, 'unixepoch')) as month,
+            strftime('%Y', datetime(t.date / 1000, 'unixepoch', 'localtime')) as year,
+            strftime('%m', datetime(t.date / 1000, 'unixepoch', 'localtime')) as month,
             SUM(t.amount) as totalAmount 
         FROM 
             transactions t
@@ -124,8 +124,8 @@ interface TransactionDao {
         SELECT SUM(amount) 
         FROM transactions 
         WHERE type = :type 
-        AND strftime('%Y', datetime(date / 1000, 'unixepoch')) = :year 
-        AND strftime('%m', datetime(date / 1000, 'unixepoch')) = :month
+        AND strftime('%Y', datetime(date / 1000, 'unixepoch', 'localtime')) = :year 
+        AND strftime('%m', datetime(date / 1000, 'unixepoch', 'localtime')) = :month
     """)
     fun getTotalIncomeByMonth(year: String, month: String, type: TransactionType = TransactionType.INCOME): Flow<Double?>
 
@@ -133,8 +133,8 @@ interface TransactionDao {
         SELECT SUM(amount) 
         FROM transactions 
         WHERE type = :type 
-        AND strftime('%Y', datetime(date / 1000, 'unixepoch')) = :year 
-        AND strftime('%m', datetime(date / 1000, 'unixepoch')) = :month
+        AND strftime('%Y', datetime(date / 1000, 'unixepoch', 'localtime')) = :year 
+        AND strftime('%m', datetime(date / 1000, 'unixepoch', 'localtime')) = :month
     """)
     fun getTotalExpenseByMonth(year: String, month: String, type: TransactionType = TransactionType.EXPENSE): Flow<Double?>
 

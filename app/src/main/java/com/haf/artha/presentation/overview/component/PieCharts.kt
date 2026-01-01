@@ -38,7 +38,7 @@ fun PieChart(
     var startAngle = 0f
 
     Canvas(modifier = modifier.size(200.dp)) {
-        val radius = size.minDimension / 2
+        val radius = size.minDimension / 2 * 0.85f
         val center = Offset(size.width / 2, size.height / 2)
         data.forEach { item ->
             val sweep = (item.totalAmount / total * 360f).toFloat()
@@ -52,7 +52,20 @@ fun PieChart(
             val percent = item.totalAmount / total * 100
             val angle = startAngle + sweep / 2
             val radian = Math.toRadians(angle.toDouble())
-            val textRadius = radius * 0.7f
+            val isSmallSlice = percent < 5.0
+            val textRadius = if (isSmallSlice){
+                radius * 1.15f
+            } else {
+                radius * 0.7f
+            }
+
+            val align = if (isSmallSlice) {
+                // Determine if text is on the left or right half of the chart
+                if (angle > 90f && angle < 270f) android.graphics.Paint.Align.RIGHT
+                else android.graphics.Paint.Align.LEFT
+            } else {
+                android.graphics.Paint.Align.CENTER
+            }
             val x = center.x + (textRadius * cos(radian)).toFloat()
             val y = center.y + (textRadius * sin(radian)).toFloat()
 
@@ -60,12 +73,12 @@ fun PieChart(
                 val paint = TextPaint().apply {
                     color = android.graphics.Color.BLACK
                     textSize = 32f
-                    textAlign = android.graphics.Paint.Align.CENTER
+                    textAlign = align
                 }
                 drawText(
-                    "${percent.toInt()}%",
+                    "%.1f%%".format(percent),
                     x,
-                    y,
+                    y+ (paint.textSize / 3),
                     paint
                 )
             }

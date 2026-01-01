@@ -25,7 +25,6 @@ class OverviewViewModel @Inject constructor(
         }
 
     }
-// TODO add the previous month data fetch function
     private val _incomeData = MutableStateFlow<Double>(0.0)
     val incomeData = _incomeData.asStateFlow()
 

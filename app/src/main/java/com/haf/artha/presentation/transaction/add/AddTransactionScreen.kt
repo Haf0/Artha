@@ -256,14 +256,14 @@ fun TransactionForm(
     OutlinedTextField(
         value = transactionName,
         onValueChange = onTransactionNameChange,
-        label = { Text("Transaction Name") },
+        label = { Text("Nama Transaksi") },
         modifier = Modifier.fillMaxWidth(),
         maxLines = 1
     )
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    Text(text = "Select Wallet:")
+    Text(text = "Pilih Dompet:")
     LazyRow {
         items(accounts) { account ->
             AccountItem(
@@ -286,7 +286,7 @@ fun TransactionForm(
             value = selectedCategory.name,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Category") },
+            label = { Text("Kategori") },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
@@ -317,7 +317,7 @@ fun TransactionForm(
     OutlinedTextField(
         value = transactionDate.toFormattedDate(),
         onValueChange = {},
-        label = { Text("Transaction Date") },
+        label = { Text("tanggal") },
         modifier = Modifier
             .width(200.dp)
             .padding(top = 4.dp)
@@ -339,7 +339,7 @@ fun TransactionForm(
     OutlinedTextField(
         value = transactionNote,
         onValueChange = onTransactionNoteChange,
-        label = { Text("Note (Max 150 chars)") },
+        label = { Text("Catatan (max 150 huruf)") },
         modifier = Modifier.fillMaxWidth(),
         maxLines = 3
     )
