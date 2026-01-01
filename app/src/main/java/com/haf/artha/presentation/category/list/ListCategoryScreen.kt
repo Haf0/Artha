@@ -78,10 +78,7 @@ fun ListCategoryScreen(
                        keyboardController?.hide()
                    }
            ){
-                CategoryItem(
-                    modifier.padding(bottom = 56.dp),
-                    items = (categoryList as UiState.Success).data.sortedBy { it.name }
-                )
+                CategoryItem(modifier.padding(bottom = 56.dp))
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()

@@ -117,7 +117,6 @@ fun AddTransactionContent(
     var selectedToWallet by remember { mutableStateOf(accounts.getOrNull(1) ?: AccountEntity(-1, "E-wallet", "E-wallet", 100000.0)) }
     var selectedCategory by remember { mutableStateOf(categories.firstOrNull() ?: CategoryEntity(0, "Default", Color.Gray.toArgb())) }
     var isButtonEnabled by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
     var showDatePickerModal by remember { mutableStateOf(false) }
 
     LaunchedEffect(selectedFromWallet) {

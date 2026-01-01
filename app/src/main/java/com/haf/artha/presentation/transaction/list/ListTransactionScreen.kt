@@ -288,7 +288,7 @@ fun FilterModalContent(
                 .positionAwareImePadding()
                 .verticalScroll(rememberScrollState())
         ) {
-            val context = LocalContext.current
+            LocalContext.current
             Text("Akun", modifier = Modifier.padding(top = 16.dp))
             Spacer(modifier = Modifier.padding(bottom = 4.dp, top = 8.dp, start = 4.dp, end = 4.dp))
             FlowRow {

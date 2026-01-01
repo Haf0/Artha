@@ -5,27 +5,6 @@ import java.util.Date
 import java.util.Locale
 
 object DateUtils {
-    // Get start and end of a specific day
-    fun getStartAndEndOfSpecificDay(timestamp: Long): Pair<Long, Long> {
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = timestamp
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        val startOfDay = calendar.timeInMillis
-
-        calendar.apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }
-        val endOfDay = calendar.timeInMillis
-
-        return Pair(startOfDay, endOfDay)
-    }
 
     // Get start and end of a specific month
     fun getStartAndEndOfSpecificMonth(timestamp: Long): Pair<Long, Long> {
@@ -44,37 +23,6 @@ object DateUtils {
         val endOfMonth = calendar.timeInMillis
 
         return Pair(startOfMonth, endOfMonth)
-    }
-
-    fun getStartAndEndOfCurrentWeek(timestamp: Long): Pair<Long, Long> {
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = timestamp
-            set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        val startOfWeek = calendar.timeInMillis
-        calendar.add(Calendar.WEEK_OF_YEAR, 1)
-        val endOfWeek = calendar.timeInMillis - 1
-        return Pair(startOfWeek, endOfWeek)
-    }
-
-    fun getStartAndEndOfLastWeek(timestamp: Long): Pair<Long, Long> {
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = timestamp
-            set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
-            add(Calendar.WEEK_OF_YEAR, -1)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        val startOfLastWeek = calendar.timeInMillis
-        calendar.add(Calendar.WEEK_OF_YEAR, 1)
-        val endOfLastWeek = calendar.timeInMillis - 1
-        return Pair(startOfLastWeek, endOfLastWeek)
     }
 
     fun Long.toFormattedDate(): String {
@@ -132,14 +80,6 @@ object DateUtils {
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         return Pair(year, month)
-    }
-
-    fun getMonthName(month: Int): String {
-        val months = arrayOf(
-            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-        )
-        return if (month in 0..11) months[month] else "Bulan tidak valid"
     }
 
 }

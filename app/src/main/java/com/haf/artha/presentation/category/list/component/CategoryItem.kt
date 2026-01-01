@@ -50,13 +50,11 @@ import com.haf.artha.ui.theme.listColorOption
 @Composable
 fun CategoryItem(
     modifier: Modifier,
-    items: List<CategoryEntity>, // Keeping this signature, though we use VM data
     viewModel: ListCategoryViewModel = hiltViewModel()
 ) {
     val uiSuccess by viewModel.categoryList.collectAsState()
     val allItems = (uiSuccess as? UiState.Success)?.data ?: emptyList()
 
-    // Filter the list once, before the UI loop
     val displayItems = remember(allItems) {
         allItems.filter { it.name != "Transfer" }
     }
@@ -64,16 +62,12 @@ fun CategoryItem(
     val colorsOption = listColorOption
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // STATE MANAGEMENT
-    // We track the ID of the item being edited, not the index
     var editingId by remember { mutableIntStateOf(-1) }
 
-    // Temporary state for the values being edited
     var tempName by remember { mutableStateOf("") }
     var tempColor by remember { mutableIntStateOf(0) }
     var isColorPickerOpen by remember { mutableStateOf(false) }
 
-    // Dialog State
     var showDeleteDialog by remember { mutableStateOf(false) }
     var itemToDeleteId by remember { mutableIntStateOf(-1) }
 
@@ -97,8 +91,6 @@ fun CategoryItem(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        // KEY FIX: Use 'items' with a 'key'. This ensures Compose tracks items by ID,
-        // preventing UI glitches when list order changes.
         items(
             items = displayItems,
             key = { it.id }
@@ -106,7 +98,6 @@ fun CategoryItem(
 
             val isEditing = editingId == item.id
 
-            // Determine what to show: The temp state (if editing) or the actual item data
             val displayName = if (isEditing) tempName else item.name
             val displayColor = if (isEditing) tempColor else item.color
 
@@ -136,7 +127,6 @@ fun CategoryItem(
                                 }
                         )
 
-                        // Name Field / Text
                         if (isEditing) {
                             OutlinedTextField(
                                 value = tempName,
@@ -156,7 +146,6 @@ fun CategoryItem(
                             )
                         }
 
-                        // Action Buttons
                         Row {
                             IconButton(onClick = {
                                 if (isEditing) {
@@ -200,7 +189,6 @@ fun CategoryItem(
                         }
                     }
 
-                    // Color Picker (Only show if this specific item is editing and picker is toggled)
                     if (isEditing && isColorPickerOpen) {
                         ColorOptionsRow(
                             colors = colorsOption,

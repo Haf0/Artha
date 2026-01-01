@@ -7,7 +7,6 @@ import com.haf.artha.data.local.db.dao.TransactionDao
 import com.haf.artha.data.local.entity.TransactionEntity
 import com.haf.artha.data.local.model.CategoryAmount
 import com.haf.artha.data.local.model.TransactionType
-import com.haf.artha.data.local.model.TypeAmount
 import com.haf.artha.data.model.TransactionDetail
 import com.haf.artha.data.model.TransactionFilterState
 import kotlinx.coroutines.flow.Flow
@@ -81,7 +80,6 @@ class TransactionRepository @Inject constructor(
         insertTransaction(transaction)
     }
 
-    // Delete a transaction and update the account balance accordingly
     suspend fun deleteTransaction(transaction: TransactionDetail) {
         transactionDao.deleteById(transaction.id)
 
@@ -112,47 +110,15 @@ class TransactionRepository @Inject constructor(
         }
     }
 
-    // Fetch all transactions
-    fun getAllTransactions(): Flow<List<TransactionEntity>> {
-        return transactionDao.getAllTransactions()
-    }
-
-    // Fetch a transaction by ID
     suspend fun getTransactionById(transactionId: Int): TransactionDetail {
         return transactionDao.getTransactionDetailById(transactionId)
     }
 
-    // Fetch transactions for a specific day
-    fun getTransactionsByDay(timestamp: Long): Flow<List<TransactionEntity>> {
-        val (startOfDay, endOfDay) = DateUtils.getStartAndEndOfSpecificDay(timestamp)
-        return transactionDao.getTransactionsBySpecificDay(startOfDay, endOfDay)
-    }
-
-    // Fetch transactions for a specific month
-    fun getTransactionsByMonth(timestamp: Long): Flow<List<TransactionEntity>> {
-        val (startOfMonth, endOfMonth) = DateUtils.getStartAndEndOfSpecificMonth(timestamp)
-        return transactionDao.getTransactionsBySpecificMonth(startOfMonth, endOfMonth)
-    }
-
-    // Fetch transactions for a this week
-    fun getTransactionsByWeek(timestamp: Long): Flow<List<TransactionEntity>> {
-        val (startOfWeek, endOfWeek) = DateUtils.getStartAndEndOfCurrentWeek(timestamp)
-        return transactionDao.getTransactionsBySpecificWeek(startOfWeek, endOfWeek)
-    }
-
-    // Fetch transactions for a last week
-    fun getTransactionsByLastWeek(timestamp: Long): Flow<List<TransactionEntity>> {
-        val (startOfWeek, endOfWeek) = DateUtils.getStartAndEndOfLastWeek(timestamp)
-        return transactionDao.getTransactionsBySpecificWeek(startOfWeek, endOfWeek)
-    }
-
-    // Fetch the total income for this month
     fun getTotalIncomeThisMonth(): Flow<Double> {
         val (startOfMonth, endOfMonth) = DateUtils.getStartAndEndOfSpecificMonth(DateUtils.getTodayTimestamp())
         return transactionDao.getTotalIncomeThisMonth(startOfMonth, endOfMonth, TransactionType.INCOME).map { it ?: 0.0 }
     }
 
-    // Fetch the total expense for this month
     fun getTotalExpenseThisMonth(): Flow<Double> {
         val (startOfMonth, endOfMonth) = DateUtils.getStartAndEndOfSpecificMonth(DateUtils.getTodayTimestamp())
         return transactionDao.getTotalExpenseThisMonth(startOfMonth, endOfMonth).map { it ?: 0.0 }
@@ -226,10 +192,6 @@ class TransactionRepository @Inject constructor(
     fun getCategoryAmount(year: Int,month:Int): Flow<List<CategoryAmount>> {
         val formattedMonth = month.toString().padStart(2, '0')
         return transactionDao.getCategoryAmount("$year",formattedMonth)
-    }
-
-    fun getTransactionTypeAmount(year: Int,month:Int): Flow<List<TypeAmount>> {
-        return transactionDao.getTypeAmount(year,month)
     }
 
     fun getTotalIncomeByMonth(year: Int, month: Int): Flow<Double> {

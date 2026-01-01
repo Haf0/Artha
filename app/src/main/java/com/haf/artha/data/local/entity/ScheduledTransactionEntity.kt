@@ -15,7 +15,6 @@ import kotlinx.parcelize.Parcelize
 @Entity(
     tableName = "scheduled_transactions",
     foreignKeys = [
-        // Foreign Key to Account (Money comes from here)
         ForeignKey(
             entity = AccountEntity::class,
             parentColumns = ["id"],
@@ -23,7 +22,6 @@ import kotlinx.parcelize.Parcelize
             onDelete = CASCADE,
             onUpdate = CASCADE
         ),
-        // Foreign Key to Category
         ForeignKey(
             entity = CategoryEntity::class,
             parentColumns = ["id"],
@@ -31,7 +29,6 @@ import kotlinx.parcelize.Parcelize
             onDelete = CASCADE,
             onUpdate = CASCADE
         ),
-        // Foreign Key to 'To Account' (for transfers)
         ForeignKey(
             entity = AccountEntity::class,
             parentColumns = ["id"],
@@ -46,7 +43,6 @@ data class ScheduledTransactionEntity(
     @ColumnInfo(name = "id")
     val id: Int = 0,
 
-    // --- Standard Transaction Data (Copied from TransactionEntity) ---
     @ColumnInfo(name = "account_id", index = true)
     val accountId: Int,
 
@@ -68,14 +64,10 @@ data class ScheduledTransactionEntity(
     @ColumnInfo(name = "note")
     val note: String,
 
-    // --- Scheduler Specific Columns ---
 
-    // When should this transaction execute? (Time in millis)
     @ColumnInfo(name = "next_execution_date")
     val nextExecutionDate: Long,
 
-    // How often does it repeat? 
-    // Use an Enum or String constant (e.g., "DAILY", "WEEKLY", "MONTHLY", "NONE")
     @ColumnInfo(name = "frequency")
     val frequency: String,
 
