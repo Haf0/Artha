@@ -203,7 +203,7 @@ fun BottomSheetContent(
                                 }
                             }
                     }else{
-                        Toast.makeText(context, "", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "nama kategori tidak boleh kosong", Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {

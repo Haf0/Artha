@@ -74,7 +74,7 @@ fun AccountScreenContent(
             },
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)
         ) {
-            Text("Tambah Akun")
+            Text("Tambah Dompet")
         }
     }
 

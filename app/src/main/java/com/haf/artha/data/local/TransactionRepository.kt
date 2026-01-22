@@ -45,40 +45,6 @@ class TransactionRepository @Inject constructor(
             }
         }
     }
-    /* TODO need to change delete the transaction by ID then insert the as the new transaction*/
-    suspend fun updateTransaction(transaction: TransactionEntity) {
-        val oldTransaction = transaction.transactionId.let {
-            transactionDao.getTransactionById(it)
-        }
-
-        // Revert the account balance for the old transaction
-        val account = accountDao.getAccountById(oldTransaction.accountId)
-        if (account != null) {
-            when (oldTransaction.type) {
-                TransactionType.INCOME -> {
-                    accountDao.update(account.copy(balance = account.balance - oldTransaction.amount))
-                }
-                TransactionType.EXPENSE -> {
-                    accountDao.update(account.copy(balance = account.balance + oldTransaction.amount))
-                }
-                TransactionType.TRANSFER -> {
-                    val sourceAccount = accountDao.getAccountById(oldTransaction.accountId)
-                    val destinationAccount = accountDao.getAccountById(oldTransaction.categoryId)
-
-                    if (sourceAccount != null && destinationAccount != null) {
-                        accountDao.update(sourceAccount.copy(balance = sourceAccount.balance + oldTransaction.amount))
-                        accountDao.update(destinationAccount.copy(balance = destinationAccount.balance - oldTransaction.amount))
-                    }
-                }
-            }
-        }
-
-        // Update the transaction
-        transactionDao.update(transaction)
-
-        // Update the account balance for the new transaction
-        insertTransaction(transaction)
-    }
 
     suspend fun deleteTransaction(transaction: TransactionDetail) {
         transactionDao.deleteById(transaction.id)

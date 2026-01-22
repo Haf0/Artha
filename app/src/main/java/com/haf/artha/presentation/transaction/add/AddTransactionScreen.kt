@@ -449,7 +449,7 @@ fun handleTransactionButtonClick(
     setIsButtonEnabled: (Boolean) -> Unit
 ) {
     Log.d(TAG, "handleTransactionButtonClick: $transactionType, $selectedWallet, $selectedCategory, $transactionDate, $transactionName, $transactionNote, $transactionAmount")
-    if (transactionName.isEmpty()||transactionAmount.toDouble()==0.0 || transactionAmount.isEmpty()) {
+    if (transactionName.isEmpty() || transactionAmount.isEmpty()) {
         setIsButtonEnabled(false)
         Toast.makeText(context, "Nama dan Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
         return

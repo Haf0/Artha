@@ -27,8 +27,7 @@ class AccountRepository @Inject constructor(
     fun getAllAccounts(): Flow<List<AccountEntity>> {
         return accountDao.getAllAccounts()
     }
-
-    //sum of all account balance
+    
     fun getTotalBalance(): Flow<Double> {
         return accountDao.getTotalBalance()
     }

@@ -117,29 +117,4 @@ class AddTransactionViewModel @Inject constructor(
     }
 
 
-
-
-    fun editTransaction(
-        transaction: TransactionEntity,
-        name: String,
-        accountId: Int,
-        categoryId: Int,
-        date: Long,
-        note: String,
-        amount: Double
-    ) {
-        viewModelScope.launch {
-            transactionRepository.updateTransaction(
-                transaction.copy(
-                    name =  name,
-                    accountId = accountId,
-                    categoryId = categoryId,
-                    date = date,
-                    note = note,
-                    amount = amount
-                )
-            )
-        }
-    }
-
 }

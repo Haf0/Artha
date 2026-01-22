@@ -24,7 +24,7 @@ data class BottomNavigationItem(
         val items = listOf(
             BottomNavigationItem(Screen.Home , R.drawable.home, "Home"),
             BottomNavigationItem(Screen.Overview, R.drawable.overview, "Overview"),
-            BottomNavigationItem(Screen.Account, R.drawable.bank_account, "Account"),
+            BottomNavigationItem(Screen.Account, R.drawable.bank_account, "Wallet"),
             BottomNavigationItem(Screen.Setting, R.drawable.settings, "Setting")
         )
     }
