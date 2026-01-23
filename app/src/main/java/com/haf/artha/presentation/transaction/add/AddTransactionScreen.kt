@@ -148,7 +148,31 @@ fun AddTransactionContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (transactionType != TransactionType.TRANSFER) {
+        if (transactionType == TransactionType.TRANSFER) {
+            TransferForm(
+                accounts = accounts,
+                selectedFromWallet = selectedFromWallet,
+                onFromWalletSelected = { selectedFromWallet = it },
+                selectedToWallet = selectedToWallet,
+                onToWalletSelected = { selectedToWallet = it },
+                transactionAmount = transactionAmount,
+                onTransactionAmountChange = { transactionAmount = it },
+                isButtonEnabled = isButtonEnabled,
+                onButtonClick = {
+                    handleTransferButtonClick(
+                        selectedFromWallet = selectedFromWallet,
+                        selectedToWallet = selectedToWallet,
+                        transactionAmount = transactionAmount,
+                        transactionDate = transactionDate,
+                        transferFunds = transferFunds,
+                        onBack = onBack,
+                        context = context,
+                        isButtonEnabled = isButtonEnabled,
+                        setIsButtonEnabled = { isButtonEnabled = it }
+                    )
+                }
+            )
+        } else {
             TransactionForm(
                 transactionName = transactionName,
                 onTransactionNameChange = { transactionName = it },
@@ -179,30 +203,6 @@ fun AddTransactionContent(
                         context = context,
                         isButtonEnabled = isButtonEnabled,
                         setIsButtonEnabled = { isButtonEnabled = it },
-                    )
-                }
-            )
-        } else {
-            TransferForm(
-                accounts = accounts,
-                selectedFromWallet = selectedFromWallet,
-                onFromWalletSelected = { selectedFromWallet = it },
-                selectedToWallet = selectedToWallet,
-                onToWalletSelected = { selectedToWallet = it },
-                transactionAmount = transactionAmount,
-                onTransactionAmountChange = { transactionAmount = it },
-                isButtonEnabled = isButtonEnabled,
-                onButtonClick = {
-                    handleTransferButtonClick(
-                        selectedFromWallet = selectedFromWallet,
-                        selectedToWallet = selectedToWallet,
-                        transactionAmount = transactionAmount,
-                        transactionDate = transactionDate,
-                        transferFunds = transferFunds,
-                        onBack = onBack,
-                        context = context,
-                        isButtonEnabled = isButtonEnabled,
-                        setIsButtonEnabled = { isButtonEnabled = it }
                     )
                 }
             )
@@ -518,7 +518,19 @@ fun handleTransferButtonClick(
         setIsButtonEnabled(true)
         Log.d(TAG, "handleTransferButtonClick: $selectedFromWallet, $selectedToWallet, $transactionAmount, $transactionDate")
         when {
-            selectedFromWallet.id != -1 && selectedToWallet.id != -1 -> {
+            transactionAmount.isEmpty() -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
+            }
+            transactionAmount.toDouble() > selectedFromWallet.balance -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
+            }
+            transactionAmount.toDouble() == 0.0 -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Jumlah tidak boleh 0", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
                 transferFunds(
                     selectedFromWallet,
                     selectedToWallet,
@@ -526,22 +538,6 @@ fun handleTransferButtonClick(
                     transactionDate
                 )
                 onBack()
-            }
-            transactionAmount.toDouble() > selectedFromWallet.balance -> {
-                setIsButtonEnabled(false)
-                Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
-            }
-            transactionAmount.isEmpty() -> {
-                setIsButtonEnabled(false)
-                Toast.makeText(context, "Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
-            }
-            transactionAmount.toDouble() == 0.0 -> {
-                setIsButtonEnabled(false)
-                Toast.makeText(context, "Jumlah tidak boleh 0", Toast.LENGTH_SHORT).show()
-            }
-            else -> {
-                setIsButtonEnabled(false)
-                Toast.makeText(context, "Jangan Lupa Pilih Akun", Toast.LENGTH_SHORT).show()
             }
         }
     }
