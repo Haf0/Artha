@@ -491,9 +491,7 @@ fun handleTransactionButtonClick(
                     Log.d(TAG, "handleTransactionButtonClick: ${TransactionType.EXPENSE}, $transactionName, ${selectedWallet.id}, ${selectedCategory.id}, $transactionDate, $transactionNote, ${transactionAmount.toDouble()}")
 
                 }
-                else->{
-
-                }
+                else->{}
             }
             onBack()
         } else {
