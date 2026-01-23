@@ -55,7 +55,7 @@ fun CategoryItem(
     viewModel: ListCategoryViewModel = hiltViewModel()
 ) {
     val uiSuccess by viewModel.categoryList.collectAsState()
-    val allItems = (uiSuccess as? UiState.Success)?.data ?: emptyList()
+    val allItems = ((uiSuccess as? UiState.Success)?.data ?: emptyList()).sortedBy { it.name.lowercase() }
 
     val displayItems = remember(allItems) {
         allItems.filter { it.name != "Transfer" }
@@ -96,7 +96,6 @@ fun CategoryItem(
             items = displayItems,
             key = { it.id }
         ) { item ->
-
             val isEditing = editingId == item.id
 
             val displayName = if (isEditing) tempName else item.name
