@@ -169,7 +169,7 @@ fun BottomSheetContent(
                         .weight(1f),
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Kategori Baru") },
+                    label = { Text("Nama Kategori Baru") },
                     singleLine = true,
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),

@@ -82,7 +82,7 @@ fun createIncomeExpenseBitmap(
 
 @Preview(showBackground = true)
 @Composable
-fun GraphPreview() {
+fun ProfitPreview() {
     SharedImage(isProfit = true)
 }
 
