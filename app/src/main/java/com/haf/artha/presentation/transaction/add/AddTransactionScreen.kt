@@ -117,7 +117,6 @@ fun AddTransactionContent(
     var selectedToWallet by remember { mutableStateOf(accounts.getOrNull(1) ?: AccountEntity(-1, "E-wallet", "E-wallet", 100000.0)) }
     var selectedCategory by remember { mutableStateOf(categories.firstOrNull() ?: CategoryEntity(0, "Default", Color.Gray.toArgb())) }
     var isButtonEnabled by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
     var showDatePickerModal by remember { mutableStateOf(false) }
 
     LaunchedEffect(selectedFromWallet) {
@@ -149,7 +148,31 @@ fun AddTransactionContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (transactionType != TransactionType.TRANSFER) {
+        if (transactionType == TransactionType.TRANSFER) {
+            TransferForm(
+                accounts = accounts,
+                selectedFromWallet = selectedFromWallet,
+                onFromWalletSelected = { selectedFromWallet = it },
+                selectedToWallet = selectedToWallet,
+                onToWalletSelected = { selectedToWallet = it },
+                transactionAmount = transactionAmount,
+                onTransactionAmountChange = { transactionAmount = it },
+                isButtonEnabled = isButtonEnabled,
+                onButtonClick = {
+                    handleTransferButtonClick(
+                        selectedFromWallet = selectedFromWallet,
+                        selectedToWallet = selectedToWallet,
+                        transactionAmount = transactionAmount,
+                        transactionDate = transactionDate,
+                        transferFunds = transferFunds,
+                        onBack = onBack,
+                        context = context,
+                        isButtonEnabled = isButtonEnabled,
+                        setIsButtonEnabled = { isButtonEnabled = it }
+                    )
+                }
+            )
+        } else {
             TransactionForm(
                 transactionName = transactionName,
                 onTransactionNameChange = { transactionName = it },
@@ -180,30 +203,6 @@ fun AddTransactionContent(
                         context = context,
                         isButtonEnabled = isButtonEnabled,
                         setIsButtonEnabled = { isButtonEnabled = it },
-                    )
-                }
-            )
-        } else {
-            TransferForm(
-                accounts = accounts,
-                selectedFromWallet = selectedFromWallet,
-                onFromWalletSelected = { selectedFromWallet = it },
-                selectedToWallet = selectedToWallet,
-                onToWalletSelected = { selectedToWallet = it },
-                transactionAmount = transactionAmount,
-                onTransactionAmountChange = { transactionAmount = it },
-                isButtonEnabled = isButtonEnabled,
-                onButtonClick = {
-                    handleTransferButtonClick(
-                        selectedFromWallet = selectedFromWallet,
-                        selectedToWallet = selectedToWallet,
-                        transactionAmount = transactionAmount,
-                        transactionDate = transactionDate,
-                        transferFunds = transferFunds,
-                        onBack = onBack,
-                        context = context,
-                        isButtonEnabled = isButtonEnabled,
-                        setIsButtonEnabled = { isButtonEnabled = it }
                     )
                 }
             )
@@ -257,14 +256,14 @@ fun TransactionForm(
     OutlinedTextField(
         value = transactionName,
         onValueChange = onTransactionNameChange,
-        label = { Text("Transaction Name") },
+        label = { Text("Nama Transaksi") },
         modifier = Modifier.fillMaxWidth(),
         maxLines = 1
     )
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    Text(text = "Select Wallet:")
+    Text(text = "Pilih Dompet:")
     LazyRow {
         items(accounts) { account ->
             AccountItem(
@@ -287,7 +286,7 @@ fun TransactionForm(
             value = selectedCategory.name,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Category") },
+            label = { Text("Kategori") },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
@@ -318,7 +317,7 @@ fun TransactionForm(
     OutlinedTextField(
         value = transactionDate.toFormattedDate(),
         onValueChange = {},
-        label = { Text("Transaction Date") },
+        label = { Text("tanggal") },
         modifier = Modifier
             .width(200.dp)
             .padding(top = 4.dp)
@@ -340,7 +339,7 @@ fun TransactionForm(
     OutlinedTextField(
         value = transactionNote,
         onValueChange = onTransactionNoteChange,
-        label = { Text("Note (Max 150 chars)") },
+        label = { Text("Catatan (max 150 huruf)") },
         modifier = Modifier.fillMaxWidth(),
         maxLines = 3
     )
@@ -450,7 +449,7 @@ fun handleTransactionButtonClick(
     setIsButtonEnabled: (Boolean) -> Unit
 ) {
     Log.d(TAG, "handleTransactionButtonClick: $transactionType, $selectedWallet, $selectedCategory, $transactionDate, $transactionName, $transactionNote, $transactionAmount")
-    if (transactionName.isEmpty()||transactionAmount.toDouble()==0.0 || transactionAmount.isEmpty()) {
+    if (transactionName.isEmpty() || transactionAmount.isEmpty()) {
         setIsButtonEnabled(false)
         Toast.makeText(context, "Nama dan Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
         return
@@ -492,9 +491,7 @@ fun handleTransactionButtonClick(
                     Log.d(TAG, "handleTransactionButtonClick: ${TransactionType.EXPENSE}, $transactionName, ${selectedWallet.id}, ${selectedCategory.id}, $transactionDate, $transactionNote, ${transactionAmount.toDouble()}")
 
                 }
-                else->{
-
-                }
+                else->{}
             }
             onBack()
         } else {
@@ -519,7 +516,19 @@ fun handleTransferButtonClick(
         setIsButtonEnabled(true)
         Log.d(TAG, "handleTransferButtonClick: $selectedFromWallet, $selectedToWallet, $transactionAmount, $transactionDate")
         when {
-            selectedFromWallet.id != -1 && selectedToWallet.id != -1 -> {
+            transactionAmount.isEmpty() -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
+            }
+            transactionAmount.toDouble() > selectedFromWallet.balance -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
+            }
+            transactionAmount.toDouble() == 0.0 -> {
+                setIsButtonEnabled(false)
+                Toast.makeText(context, "Jumlah tidak boleh 0", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
                 transferFunds(
                     selectedFromWallet,
                     selectedToWallet,
@@ -527,22 +536,6 @@ fun handleTransferButtonClick(
                     transactionDate
                 )
                 onBack()
-            }
-            transactionAmount.toDouble() > selectedFromWallet.balance -> {
-                setIsButtonEnabled(false)
-                Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
-            }
-            transactionAmount.isEmpty() -> {
-                setIsButtonEnabled(false)
-                Toast.makeText(context, "Jumlah tidak boleh kosong", Toast.LENGTH_SHORT).show()
-            }
-            transactionAmount.toDouble() == 0.0 -> {
-                setIsButtonEnabled(false)
-                Toast.makeText(context, "Jumlah tidak boleh 0", Toast.LENGTH_SHORT).show()
-            }
-            else -> {
-                setIsButtonEnabled(false)
-                Toast.makeText(context, "Jangan Lupa Pilih Akun", Toast.LENGTH_SHORT).show()
             }
         }
     }

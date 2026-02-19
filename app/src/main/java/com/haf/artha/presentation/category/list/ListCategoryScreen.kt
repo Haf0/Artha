@@ -78,10 +78,7 @@ fun ListCategoryScreen(
                        keyboardController?.hide()
                    }
            ){
-                CategoryItem(
-                    modifier.padding(bottom = 56.dp),
-                    items = (categoryList as UiState.Success).data.sortedBy { it.name }
-                )
+                CategoryItem(modifier.padding(bottom = 56.dp))
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -172,7 +169,7 @@ fun BottomSheetContent(
                         .weight(1f),
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Kategori Baru") },
+                    label = { Text("Nama Kategori Baru") },
                     singleLine = true,
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
@@ -206,7 +203,7 @@ fun BottomSheetContent(
                                 }
                             }
                     }else{
-                        Toast.makeText(context, "", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "nama kategori tidak boleh kosong", Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {

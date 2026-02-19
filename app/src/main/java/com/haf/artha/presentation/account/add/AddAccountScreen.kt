@@ -68,11 +68,8 @@ fun AddAccountScreenContent(
                     accountBalance = it.balance.toInt().toString()
                 }
             }
-
         }
-
     }
-
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -96,11 +93,10 @@ fun AddAccountScreenContent(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             OutlinedTextField(
                 value = accountName,
                 onValueChange = { accountName = it },
-                label = { Text("Nama Akun") },
+                label = { Text("Nama") },
                 modifier = modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions (
@@ -109,12 +105,12 @@ fun AddAccountScreenContent(
                     }
                 ),
                 maxLines = 1
-
             )
             OutlinedTextField(
                 value = accountBalance,
                 onValueChange = { accountBalance = it },
                 label = { Text("Saldo Awal") },
+                readOnly = accountId != null,
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
@@ -137,7 +133,7 @@ fun AddAccountScreenContent(
             Button(
                 modifier = modifier.fillMaxWidth(),
                 onClick = {
-                    if (accountName.isEmpty() || accountBalance.toDouble() == 0.0){
+                    if (accountName.isEmpty() || accountBalance.isEmpty()){
                         Toast.makeText(context, "Tidak boleh ada yang kosong", Toast.LENGTH_SHORT).show()
                     }else{
                         if (accountId != null){
@@ -145,11 +141,11 @@ fun AddAccountScreenContent(
                         }else{
                             viewModel.addAccount(accountName, accountBalance.toDouble())
                         }
+                        navController.popBackStack()
                     }
-                    navController.popBackStack()
                 }
             ) {
-                Text(if(accountId == null)"Tambahkan Akun" else "Ubah Akun")
+                Text(if(accountId == null)"Tambahkan Dompet" else "Ubah Dompet")
             }
 
 
@@ -165,7 +161,7 @@ fun AddAccountScreenContent(
                     )
                 )
                 {
-                    Text("Hapus Akun")
+                    Text("Hapus Dompet")
                 }
             }
         }

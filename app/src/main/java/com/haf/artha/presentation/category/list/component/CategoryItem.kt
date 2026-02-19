@@ -1,5 +1,6 @@
 package com.haf.artha.presentation.category.list.component
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -50,13 +52,11 @@ import com.haf.artha.ui.theme.listColorOption
 @Composable
 fun CategoryItem(
     modifier: Modifier,
-    items: List<CategoryEntity>, // Keeping this signature, though we use VM data
     viewModel: ListCategoryViewModel = hiltViewModel()
 ) {
     val uiSuccess by viewModel.categoryList.collectAsState()
-    val allItems = (uiSuccess as? UiState.Success)?.data ?: emptyList()
+    val allItems = ((uiSuccess as? UiState.Success)?.data ?: emptyList()).sortedBy { it.name.lowercase() }
 
-    // Filter the list once, before the UI loop
     val displayItems = remember(allItems) {
         allItems.filter { it.name != "Transfer" }
     }
@@ -64,16 +64,12 @@ fun CategoryItem(
     val colorsOption = listColorOption
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // STATE MANAGEMENT
-    // We track the ID of the item being edited, not the index
     var editingId by remember { mutableIntStateOf(-1) }
 
-    // Temporary state for the values being edited
     var tempName by remember { mutableStateOf("") }
     var tempColor by remember { mutableIntStateOf(0) }
     var isColorPickerOpen by remember { mutableStateOf(false) }
 
-    // Dialog State
     var showDeleteDialog by remember { mutableStateOf(false) }
     var itemToDeleteId by remember { mutableIntStateOf(-1) }
 
@@ -82,7 +78,6 @@ fun CategoryItem(
         onConfirm = {
             viewModel.deleteCategoryById(itemToDeleteId)
             showDeleteDialog = false
-            // If we deleted the item currently being edited, reset edit state
             if (editingId == itemToDeleteId) {
                 editingId = -1
             }
@@ -97,18 +92,15 @@ fun CategoryItem(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        // KEY FIX: Use 'items' with a 'key'. This ensures Compose tracks items by ID,
-        // preventing UI glitches when list order changes.
         items(
             items = displayItems,
             key = { it.id }
         ) { item ->
-
             val isEditing = editingId == item.id
 
-            // Determine what to show: The temp state (if editing) or the actual item data
             val displayName = if (isEditing) tempName else item.name
             val displayColor = if (isEditing) tempColor else item.color
+            val context = LocalContext.current
 
             Card(
                 modifier = Modifier
@@ -123,7 +115,6 @@ fun CategoryItem(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        // Color Circle
                         Box(
                             modifier = Modifier
                                 .padding(end = 8.dp)
@@ -135,8 +126,6 @@ fun CategoryItem(
                                     isColorPickerOpen = !isColorPickerOpen
                                 }
                         )
-
-                        // Name Field / Text
                         if (isEditing) {
                             OutlinedTextField(
                                 value = tempName,
@@ -156,19 +145,17 @@ fun CategoryItem(
                             )
                         }
 
-                        // Action Buttons
                         Row {
                             IconButton(onClick = {
                                 if (isEditing) {
-                                    // SAVE
-                                    if (item.name != tempName || item.color != tempColor) {
+                                    if (item.name.isEmpty()|| item.name.isBlank()){
+                                        Toast.makeText(context, "tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                                    }else if (item.name != tempName || item.color != tempColor) {
                                         viewModel.updateCategory(item.copy(name = tempName, color = tempColor))
                                     }
                                     editingId = -1
                                     isColorPickerOpen = false
                                 } else {
-                                    // START EDIT
-                                    // If another item was being edited, close it first (optional)
                                     editingId = item.id
                                     tempName = item.name
                                     tempColor = item.color
@@ -183,11 +170,9 @@ fun CategoryItem(
 
                             IconButton(onClick = {
                                 if (isEditing) {
-                                    // CANCEL EDIT
                                     editingId = -1
                                     isColorPickerOpen = false
                                 } else {
-                                    // DELETE
                                     itemToDeleteId = item.id
                                     showDeleteDialog = true
                                 }
@@ -200,7 +185,6 @@ fun CategoryItem(
                         }
                     }
 
-                    // Color Picker (Only show if this specific item is editing and picker is toggled)
                     if (isEditing && isColorPickerOpen) {
                         ColorOptionsRow(
                             colors = colorsOption,

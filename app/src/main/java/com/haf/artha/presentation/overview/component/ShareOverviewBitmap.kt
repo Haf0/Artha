@@ -18,5 +18,5 @@ fun shareBitmap(context: Context, bitmap: Bitmap, title: String) {
         putExtra(Intent.EXTRA_STREAM, uri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
-    context.startActivity(Intent.createChooser(intent, "Share Comparison"))
+    context.startActivity(Intent.createChooser(intent, "Share Laporan Keuangan"))
 }

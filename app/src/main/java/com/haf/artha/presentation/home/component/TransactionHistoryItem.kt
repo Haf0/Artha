@@ -60,7 +60,7 @@ fun TransactionHistoryItem(
                 modifier = modifier.fillMaxHeight()
             ) {
                 Text(text = title,modifier.width(150.dp) , maxLines = 1 , overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Medium, color = Color.Black)
-                Text(text = date, modifier = modifier.padding(top = 4.dp), fontSize = 14.sp)
+                //Text(text = date, modifier = modifier.padding(top = 4.dp), fontSize = 14.sp)
             }
             Spacer(Modifier.weight(1f).fillMaxHeight())
             Text(text = amount, fontSize = 14.sp, fontWeight = FontWeight.Medium)

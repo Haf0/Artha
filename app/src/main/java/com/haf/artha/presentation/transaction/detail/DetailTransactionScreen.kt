@@ -57,13 +57,13 @@ fun DetailTransactionScreen(
             transaction = viewModel.getTransaction(transactionId)
         }
     }
-    DetailScreenContent(transaction = transaction!!, navController = navController)
+    DetailScreenContent(modifier,transaction = transaction!!, navController = navController)
 
 }
 
 @Composable
 fun DetailScreenContent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     transaction: TransactionDetail?,
     navController: NavHostController,
     viewModel: DetailTransactionViewModel = hiltViewModel()
