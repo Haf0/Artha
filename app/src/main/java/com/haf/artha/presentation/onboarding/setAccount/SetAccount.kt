@@ -89,7 +89,7 @@ fun SetAccount (
 
             Button(
                 onClick = {
-                    if (selectedList.isNotEmpty()) {
+                    if (selectedList.isNotEmpty() && selectedList.size > 1) {
                         preferenceViewModel.setCurrentStep(2)
                         val selectedAccountList = selectedList.map{
                             AccountEntity(type = it, name = it, balance = 0.0)
@@ -101,7 +101,7 @@ fun SetAccount (
                             }
                         }
                     } else {
-                        Toast.makeText(context, "Silahkan Pilih Minimal 1 Akun", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Silahkan Pilih Minimal 2 Akun", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = modifier
